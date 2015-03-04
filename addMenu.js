@@ -79,8 +79,7 @@ function createDocumentForHtml(content) {
 function process(element){
   var openTag="";
   var closeTag="";
-  
-    var result=[];
+  var result=[];
   
   //if (element.getNumChildren() == 0)
      //   return "";
@@ -115,6 +114,9 @@ function process(element){
     if (element.getType() == DocumentApp.ElementType.TEXT){
       parseText(element,result);
     }
+    else if (item.getType()===DocumentApp.ElementType.LIST_ITEM){
+    	parseListedItem(element, result);
+    }
     //check for image
 
     //check for video
@@ -137,8 +139,30 @@ function process(element){
     return result.join('');
 }
 
+//parse logic <ul><li></li></ul>
+function parseListedItem(element,result){
+	// first get the listed style: An enumeration of the supported glyph types.
+	var openTag="";
+	var closeTag="";
+	var numChild=element.getNumChildren();
+
+	// if the listed items are not in order using tags<ul>
+	if(element.getGlyphType()!=NUMBER){
+		openTag="<ul>";
+		closeTag="</ul>";
+	}
+	//Else if the listed items are not in order using tags<ol>
+	else{
+	    openTag="<ol>";
+	    closeTag="</ol>";
+	}
+	//
+
+
+}
+
 function parseText(element,result){
-  var text = element.getText();
+    var text = element.getText();
     //Retrieves the set of text indices that correspond to the start of distinct text formatting runs
     //the set of text indices at which text formatting changes
     var indices = element.getTextAttributeIndices();
@@ -164,7 +188,7 @@ function parseText(element,result){
 function getTextFormat(attributes,startPos,element,text,result){
   var openTag="";
   var closeTag="";
-    var pass=true;
+  var pass=true;
   if (attributes.ITALIC) {
         openTag='<i>';
         closeTag='</i>';
@@ -174,14 +198,18 @@ function getTextFormat(attributes,startPos,element,text,result){
         closeTag='</b>';
       }
       if (attributes.UNDERLINE) {
-        if(element.getLinkUrl(startPos))
-          result.push('<a href="' + element.getLinkUrl(startPos) + '">' + text + '</a>');
+      	//get the url link
+        if(element.getLinkUrl(startPos)){
+        	result.push('<a href="' + element.getLinkUrl(startPos) + '">' + text + '</a>');
             pass=false;
-      }
-      //  openTag='<u>';
-      //  closeTag='</u>';
-      //}
-      if(pass){
+        }
+        //get the undeline text
+        else{
+        	openTag='<u>';
+            closeTag='</u>';
+        }
+    }
+    if(pass){
     result.push(openTag);
     result.push(text);
     result.push(closeTag);
