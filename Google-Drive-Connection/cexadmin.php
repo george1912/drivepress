@@ -66,7 +66,7 @@ function cexdrive_settings_page()
 	<?php endforeach; ?>
 	</ol>
 <?php endif; ?>
-<?php if($settings !== FALSE): ?>
+<?php if(isset($_GET['code'])): ?>
     <!--p>To use the plugin, put the <code>[gdrive]</code> shortcode in a page or post. Make sure you are sharing all the files to the public, or people shall be confused...!</p>
     <p>The shortcode takes two parameters: <code>[gdrive email="account@domain.com" folder="Name of folder"]</code>.</p>
     <p>The first is the email of the account that's authenticated above. The second is the exact name of the folder you want to display.</p>
@@ -82,6 +82,8 @@ function cexdrive_settings_page()
 
                  <?php endforeach; ?>
                 <br>
+<?php else: ?>
+    <a href="<?php echo $client->createAuthUrl(); ?>">Connect</a>
 <?php endif; ?>
 </div>
 <?php
