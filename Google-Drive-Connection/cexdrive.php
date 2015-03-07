@@ -8,6 +8,21 @@ Version: 1.2
 Author URI:
 */
 
+//start a session
+add_action('init', 'myStartSession', 1);
+add_action('wp_logout', 'myEndSession');
+add_action('wp_login', 'myEndSession');
+
+function myStartSession() {
+    if(!session_id()) {
+        session_start();
+
+    }
+}
+
+function myEndSession() {
+    session_destroy ();
+}
 // The Admin pages
 require "cexadmin.php";
 
@@ -48,13 +63,15 @@ function cexdrive_get_config()
  * @param bool Whether to merge the data or override.
  * @return array The new data array.
  */
-function cexdrive_set_config($data = array(), $merge = TRUE)
+function cexdrive_set_config($data)
 {
+	/*
 	$current = cexdrive_get_config();
-	if($current !== FALSE && $merge === TRUE)
+	if($current !== FALSE && $merge === False)
 	{
 		$data = array_merge($current, $data);
 	}
+	*/
     update_option('cexdrive-config', serialize($data));
 	return $data;
 }
@@ -72,11 +89,8 @@ function cexdrive_load_lib($url)
 
 	
 	$client = new Google_Client();
-    //$client->setClientId('413089939333-b69ldlscjjqscbbjjddtkuq92l8ar4u4.apps.googleusercontent.com');
-    //$client->setClientSecret('ah45qegsTsEBPA_TkPvIzjTq');
 	$client->setScopes(array('https://www.googleapis.com/auth/drive.readonly','https://www.googleapis.com/auth/drive'));
     $client->setRedirectUri($url);
-	//$client->setUseObjects(true);
 	
 	return $client;
 
