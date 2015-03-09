@@ -2,7 +2,7 @@
 /*
 Plugin Name: Google Drive Folder Display
 Plugin URI: 
-Description: A plugin to authenticate with Google Drive in order to display files and folders.
+Description: A plugin to authenticate with Google Drive in order to display files and folders, and eaisly move post from Google Docs to WordPress
 Author: Xin Wang
 Version: 1.2
 Author URI:
@@ -11,9 +11,9 @@ Author URI:
 // The Admin pages
 require "cexadmin.php";
 
-
 /**
  * Creates the menu item on the dashborad.
+ * Author Xin Wang
  */
 add_action( 'admin_menu', 'create_drive_menu' );
         function create_drive_menu() {
@@ -29,7 +29,11 @@ add_action( 'admin_menu', 'create_drive_menu' );
     }
 
 
-// when plugin is activated, create a new data table in database
+
+/**
+ * when plugin is activated, create a new data table in database if it is not exists
+ * Author Xin Wang
+ */
 register_activation_hook(__FILE__, 'plugin_activation_cretable');
 function plugin_activation_cretable() {
     global $wpdb;
@@ -67,7 +71,8 @@ function plugin_activation_cretable() {
 
 
 /**
- * Parses the registered options.
+ * retreive the registered account informarion of current user.
+ * Author Xin Wang
  * 
  * @return array|bool An array of options, or FALSE if not set up.
  */
@@ -85,6 +90,15 @@ function cexdrive_get_config()
 		return $data;
 }
 
+
+/**
+ * update the registered account informarion.
+ * Author Xin Wang
+ *
+ * @param array An array holds information about newly refreshed tokens.
+ *
+ * @return array|bool An array of options, or FALSE if not set up.
+ */
 function cexdrive_update_config($token)
 {
 	global $wpdb;
@@ -118,11 +132,12 @@ function cexdrive_update_config($token)
 }
 
 /**
- * Sets a config option.
+ * insert a new registration account information in the database table.
+ * Author Xin Wang
  * 
- * @param array An array that will be merged in the existing options.
- * @param bool Whether to merge the data or override.
- * @return array The new data array.
+ * @param array An array that holdes information about user and tokens.
+ *
+ * @return array The new registration information.
  */
 function cexdrive_insert_config($data)
 {
@@ -150,11 +165,9 @@ function cexdrive_insert_config($data)
  
 
 /**
- * delete a config option.
+ * delete the registration account information for current user.
+ * Author Xin Wang
  * 
- * @param array An array that will be merged in the existing options.
- * @param bool Whether to merge the data or override.
- * @return array The new data array.
  */
 function cexdrive_del_config(){
 	global $wpdb;
@@ -164,6 +177,13 @@ function cexdrive_del_config(){
 	//$wpdb->delete( $table_name, array( 'id' => 1 ), array( '%d' ) );
 }
 
+
+/**
+ * parse the raw html content of google doc.
+ * 
+ * @param array An array that holdes information about author and contents.
+ * @return array An array that holdes information about author and clean html contents.
+ */
 function get_clean_doc($contents) 
 {
 
@@ -187,7 +207,13 @@ function get_clean_doc($contents)
     return $dirty_html;
 }
 
-
+/**
+ * create a draft post in wordpress
+ * 
+ * @param string title of google doc
+ * @param array content of google doc in html
+ * @param array custom field
+ */
 function publish_to_WordPress ( $title, $content, $custom_fields = false ) {
             //If the username in gdocs matches the username in WordPress, it will automatically apply the correct username            
             $post_array = array(
@@ -205,7 +231,8 @@ function publish_to_WordPress ( $title, $content, $custom_fields = false ) {
     
 }
 /**
- * Initializes the Google SDK.
+ * Initializes the Google Client.
+ * Author Xin Wang
  * 
  * @param string $url The URL to redirect to.
  * @return object The Google Client object.

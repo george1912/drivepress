@@ -1,6 +1,6 @@
 <?php
 /**
- * Displays the settings page.
+ * Displays the google drive dispaly page.
  */
 function cexdrive_settings_page() 
 {
