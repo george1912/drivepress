@@ -1,12 +1,15 @@
 <?php
 /**
- * Displays the settings page.
+ * Displays the google drive dispaly page.
+ * Author: Xin Wang
  */
 function cexdrive_settings_page() 
 {
+    
 	$settings = cexdrive_get_config(); // Gets the current config
-	$url = admin_url( '/options-general.php?page=' . basename( dirname(__FILE__) ) . '/cexdrive.php' ); // Sets the current URL
-    $client = cexdrive_load_lib($url); // Loads the Google SDK    
+    //var_dump($settings->access_token);
+    $url = admin_url( '/options-general.php?page=' . basename( dirname(__FILE__) ) . '/cexdrive.php' ); // Sets the current URL
+    $client = cexdrive_load_lib($url); // Initialize Google Drive Access   
     // Account authorization handler
     if( isset($_GET['code']) )
     {
@@ -14,22 +17,26 @@ function cexdrive_settings_page()
         {
             
             // Authenticate
-            $token = $client->authenticate($_GET['code']);
-            $client->setAccessToken($token);
-            
+            $token_json = $client->authenticate($_GET['code']);
+            $client->setAccessToken($token_json);
+            $token=json_decode($token_json,true);
             $service = new Google_Service_Drive($client);
             $about=$service->about->get(array());
             $user=$about->getUser();
                         
-            // Data to insert
-            $data = array(
-                'token' => $token,
-            );           
+           var_dump($token);
             
             // Store credentials
             if($user['emailAddress'])
             {
-                $settings = cexdrive_set_config(array($user['emailAddress'] => $data));
+            // Data to insert
+                $data = array(
+                     //'user' => wp_get_current_user()->ID,
+                     'token' => $token,
+                     'user'  => $user['emailAddress'],
+            );
+                //$settings = cexdrive_set_config(array($user['emailAddress'] => $data));
+                $settings=cexdrive_insert_config($data);
                 $message = "User {$user['emailAddress']} added successfully.";
             }            
         }
@@ -39,14 +46,94 @@ function cexdrive_settings_page()
         }
     }
 
-    // Removing a user
-    if( isset($_GET['remove']) && $settings && array_key_exists($_GET['remove'], $settings) )
+        // Removing a user
+    else if( isset($_GET['remove']) && $settings )
     {
+        echo "start to remove";
         $name = $_GET['remove'];
-        unset( $settings[ $_GET['remove'] ] );
-        $settings = cexdrive_set_config($settings, FALSE);
+        cexdrive_del_config();
+        $settings=FALSE;
+        //$client->revokeToken();  
         $message = "User {$name} was successfully removed.";
-    }        
+
+    } 
+
+    //check if token has been stored, if nothing is recorded, indicate first time login
+    if ($settings and !empty($settings))
+    { 
+        //try{
+            //var_dump($settings);
+            //check if token has been stored
+            //if($client->isAccessTokenExpired()) {
+            $expires_in=$settings->expires_in;
+            $created=$settings->created;
+
+            if( ( $expires_in + $created - time() ) > 0){
+                echo "retrive existing access_token";
+                    $token=array(
+                        'access_token'=> $settings->access_token,
+                        'expires_in' => $settings->expires_in,
+                        'created' => $settings->created
+                        );
+                    $token_json=json_encode($token);
+                    $client->setAccessToken($token_json);
+                    $service = new Google_Service_Drive($client);
+            } 
+            else{
+                echo 'Try to refresh token'; // Debug
+                //refresh token
+                if(isset($settings->access_token)){
+                    //$client->refreshToken($settings->access_token);
+                    $client->refreshToken($settings->refresh_token);
+                    $token_json=$client->getAccessToken();
+                    $token=json_decode($token_json,true);
+                    $settings= cexdrive_update_config($token); 
+                    $client->setAccessToken($token_json);
+                    $service = new Google_Service_Drive($client);
+                }
+                else{
+                    echo "error: token is not set!";
+                }
+            
+            }
+            //check if user select a doc to convert
+            if( isset($_GET['DocId']) )
+            {
+                echo "start to convert";
+                $fileId=$_GET['DocId'];
+                try {
+                        $file = $service->files->get($fileId);
+                        /*
+                        print "Title: " . $file->getTitle();
+                        print "Description: " . $file->getDescription();
+                        print "MIME type: " . $file->getMimeType();
+                        */
+                      } 
+                catch (Exception $e) {
+                        print "An error occurred: " . $e->getMessage();
+                      }
+
+                $downloadUrl = $file->getExportLinks()['text/html'];
+                #echo $downloadUrl;
+
+                if ($downloadUrl) {
+                    $request = new Google_Http_Request($downloadUrl, 'GET', null, null);
+                    //$rest=new Google_Http_REST();
+                    //$content=$rest->doExecute($client,$request);
+                    $curl=new Google_IO_Curl($client);
+                    $result=$curl->executeRequest($request);
+                    $content=$result[0];
+                }           
+                //var_dump($content);
+                $message = "Converting Document-- Title :{$file->getTitle()}, ID: {$_GET['DocId']} ";
+                $clean_doc= get_clean_doc($content);
+                //echo $clean_doc;
+                publish_to_WordPress($file->title,$clean_doc);
+        
+            } 
+    }
+    
+       
 ?>
 <div class="wrap">
 	<h2>MET Google Drive</h2>
@@ -54,36 +141,29 @@ function cexdrive_settings_page()
     <div class="updated"><p><?php echo $message; ?></p></div>
 <?php elseif( isset($error) ): ?>
     <div class="error"><p><strong><?php echo $error; ?></strong></p></div>    
-<?php endif; ?>
-	
-<?php if($settings === FALSE): ?>
+<?php endif; ?>	
+<?php if($settings === FALSE or empty($settings) ): ?>
 	<p>You have not set up any accounts yet.</p><a href="<?php echo $client->createAuthUrl(); ?>">Add a new account</a></p>
 <?php else: ?>
 	<h3>Current Accounts:</h3>
-	<ol>
-	<?php foreach($settings as $key => $user): ?>
-	    <li><?php echo $key; ?> <a href="<?php echo $url; ?>&remove=<?php echo urlencode($key); ?>">(Remove)</a></li>
-	<?php endforeach; ?>
-	</ol>
-<?php endif; ?>
-<?php if(isset($_GET['code'])): ?>
-    <!--p>To use the plugin, put the <code>[gdrive]</code> shortcode in a page or post. Make sure you are sharing all the files to the public, or people shall be confused...!</p>
-    <p>The shortcode takes two parameters: <code>[gdrive email="account@domain.com" folder="Name of folder"]</code>.</p>
-    <p>The first is the email of the account that's authenticated above. The second is the exact name of the folder you want to display.</p>
-    <p>Easy, huh?</p-->
+    <ol>
+    <li><?php echo $settings->email; ?><a href="<?php echo $url; ?>&remove=<?php echo urlencode( $settings->email);?>">(Remove)</a></li>
+    </ol>
     <h3> Here is the document file list on your drive</h3>
         <?php  $files_list = $service->files->listFiles(array())->getItems(); ?>
-            <br>
-                <?php foreach($files_list as $item):?>
-                    <ol>
-                    <?php if ($item['mimeType']== "application/vnd.google-apps.folder" or $item['mimeType']=='application/vnd.google-apps.document') 
-                     echo '<li><img src="' . $item['iconLink'] . '" alt="Icon"> <a href="' . $item['embedLink'] . '" target=_self"'  . '">' . $item->title . '</a>'.'</li>'; ?>
-                     </ol>
-
+              <ol>
+                 <?php foreach($files_list as $item):?> 
+                    <?php if ($item['mimeType']== "application/vnd.google-apps.folder" or $item['mimeType']=='application/vnd.google-apps.document'): 
+                     
+                     echo '<li><span><img src="' . $item['iconLink'] . '" alt="Icon"> <a href="' . $item['embedLink'] . '" target=_self"'  . '">' . $item->title . '</a>';
+                     //echo "<form action=./cexdrive.php' method='get'>";
+                    // echo '<input type="hidden" name="DocId" value=$item["id"]>';
+                     echo "<a href=".$url."&DocId=".$item['id'].">(convert)</a></span></li>";?>
+                     </form>
+                 <?php endif; ?>
                  <?php endforeach; ?>
+                 </ol>
                 <br>
-<?php else: ?>
-    <a href="<?php echo $client->createAuthUrl(); ?>">Connect</a>
 <?php endif; ?>
 </div>
 <?php
