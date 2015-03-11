@@ -1,6 +1,7 @@
 <?php
 /**
  * Displays the google drive dispaly page.
+ * Author: Xin Wang
  */
 function cexdrive_settings_page() 
 {
@@ -69,7 +70,6 @@ function cexdrive_settings_page()
 
             if( ( $expires_in + $created - time() ) > 0){
                 echo "retrive existing access_token";
-
                     $token=array(
                         'access_token'=> $settings->access_token,
                         'expires_in' => $settings->expires_in,
@@ -96,25 +96,25 @@ function cexdrive_settings_page()
                 }
             
             }
-             //create a new google service
-                    //check if convert
+            //check if user select a doc to convert
             if( isset($_GET['DocId']) )
             {
                 echo "start to convert";
                 $fileId=$_GET['DocId'];
-                //require_once dirname(__FILE__). '/google-api-php-client/Google_Client.php';
                 try {
                         $file = $service->files->get($fileId);
+                        /*
                         print "Title: " . $file->getTitle();
                         print "Description: " . $file->getDescription();
                         print "MIME type: " . $file->getMimeType();
+                        */
                       } 
                 catch (Exception $e) {
                         print "An error occurred: " . $e->getMessage();
                       }
 
                 $downloadUrl = $file->getExportLinks()['text/html'];
-                echo $downloadUrl;
+                #echo $downloadUrl;
 
                 if ($downloadUrl) {
                     $request = new Google_Http_Request($downloadUrl, 'GET', null, null);
@@ -122,15 +122,13 @@ function cexdrive_settings_page()
                     //$content=$rest->doExecute($client,$request);
                     $curl=new Google_IO_Curl($client);
                     $result=$curl->executeRequest($request);
-                    $arr["filename"]= $file->getTitle();
-                    $arr['contents']=$result[0];
-
+                    $content=$result[0];
                 }           
                 //var_dump($content);
-                $message = "Converting Document {$_GET['DocId']} ";
-                $clean_doc= get_clean_doc($arr);
+                $message = "Converting Document-- Title :{$file->getTitle()}, ID: {$_GET['DocId']} ";
+                $clean_doc= get_clean_doc($content);
                 //echo $clean_doc;
-                publish_to_WordPress($file->title,$clean_doc,false);
+                publish_to_WordPress($file->title,$clean_doc);
         
             } 
     }
@@ -157,11 +155,10 @@ function cexdrive_settings_page()
                  <?php foreach($files_list as $item):?> 
                     <?php if ($item['mimeType']== "application/vnd.google-apps.folder" or $item['mimeType']=='application/vnd.google-apps.document'): 
                      
-                     echo '<li><img src="' . $item['iconLink'] . '" alt="Icon"> <a href="' . $item['embedLink'] . '" target=_self"'  . '">' . $item->title . '</a>'.'</li>';
-                     echo "<form action=./cexdrive.php' method='get'>";
-                     echo '<input type="hidden" name="DocId" value=$item["id"]>';
-                     echo "<a href=".$url."&DocId=".$item['id'].">(convert)</a></li>";
-                     echo "<input type='submit'>";?>
+                     echo '<li><span><img src="' . $item['iconLink'] . '" alt="Icon"> <a href="' . $item['embedLink'] . '" target=_self"'  . '">' . $item->title . '</a>';
+                     //echo "<form action=./cexdrive.php' method='get'>";
+                    // echo '<input type="hidden" name="DocId" value=$item["id"]>';
+                     echo "<a href=".$url."&DocId=".$item['id'].">(convert)</a></span></li>";?>
                      </form>
                  <?php endif; ?>
                  <?php endforeach; ?>

@@ -66,6 +66,9 @@ function plugin_activation_cretable() {
     ) $charset_collate;";
 
     require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+    # The dbDelta function examines the current table structure, 
+    # compares it to the desired table structure, 
+    # and either adds or modifies the table as necessary,
     dbDelta( $sql );
 }
 
@@ -187,10 +190,11 @@ function cexdrive_del_config(){
 function get_clean_doc($contents) 
 {
 
-    $contents = apply_filters( 'pre_docs_to_wp_strip', $contents );
+    $contents=extract_styles($contents);
+    //echo $contents;
     //New domDocument and xPath to get the content
     $dom= new DOMDocument();
-    $dom->loadHTML( $contents[ 'contents' ] );
+    $dom->loadHTML( $contents);
     $xpath = new DOMXPath($dom);
     
     //Strip away the headers
@@ -200,7 +204,7 @@ function get_clean_doc($contents)
     //This is our dirty HTML
     $dirty_html = $dom->saveXml($body->item(0));
     
-    $dirty_html = apply_filters( 'pre_docs_to_wp_purify', $dirty_html );
+    //$dirty_html = apply_filters( 'pre_docs_to_wp_purify', $dirty_html );
     
     //Run that through the purifier
     //$clean_html = $purifier->purify( $dirty_html );
@@ -214,18 +218,17 @@ function get_clean_doc($contents)
  * @param array content of google doc in html
  * @param array custom field
  */
-function publish_to_WordPress ( $title, $content, $custom_fields = false ) {
+function publish_to_WordPress ( $title, $content ) {
             //If the username in gdocs matches the username in WordPress, it will automatically apply the correct username            
             $post_array = array(
                 'post_title' => $title,
                 'post_content' => $content,
-                'custom_fields' => $custom_fields,
                 'post_author' => wp_get_current_user()->display_name
             );
                    
             //If you want all posts to be auto-published, for example, you can add a filter here
-            $post_array = apply_filters( 'pre_docs_to_wp_insert', $post_array );
-            
+            //$post_array = apply_filters( 'wp_insert_post_data ', $post_array );
+            $post_array['post_content']=clean($post_array['post_content']);
             //Add
             $post_id = wp_insert_post( $post_array );           
     
@@ -247,5 +250,67 @@ function cexdrive_load_lib($url)
     $client->setApprovalPrompt('force');
 	return $client;
 
+}
+
+function extract_styles( $contents ) {
+
+        //PHP doesn't honor lazy matches very well, apparently, so add newlines
+        $contents = str_replace( '}', "}\r\n", $contents );
+
+
+        preg_match_all( '#.c(?P<digit>\d+){(.*?)font-weight:bold(.*?)}#', $contents, $boldmatches );
+        preg_match_all('#.c(?P<digit>\d+){(.*?)font-style:italic(.*?)}#', $contents, $italicmatches);
+        
+        if( !empty( $boldmatches[ 'digit' ] ) ) {
+        
+            foreach( $boldmatches[ 'digit' ] as $boldclass ) {
+                $contents = preg_replace( '#<span class="(.*?)c' . $boldclass . '(.*?)">(.*?)</span>#s', '<span class="$1c' . $boldclass . '$2"><strong>$3</strong></span>', $contents );
+            }
+        
+        }
+        
+        if( !empty( $italicmatches[ 'digit' ] ) ) {
+        
+            foreach( $italicmatches[ 'digit' ] as $italicclass ) {
+                $contents = preg_replace( '#<span class="(.*?)c' . $italicclass . '(.*?)">(.*?)</span>#s', '<span class="$1c' . $italicclass . '$2"><em>$3</em>', $contents );
+            }
+        
+        }
+        
+        return $contents;
+
+}
+
+function clean($post_content) {
+        $post_content = str_replace( array( "\r\n", "\n\n", "\r\r", "\n\r" ), "\n", $post_content );
+        $post_content = preg_replace('/<div(.*?)>/', '<div>', $post_content);
+        $post_content = preg_replace('/<p(.*?)>/', '<p>', $post_content);
+        $post_content = preg_replace('/<li(.*?)>/', '<li>', $post_content);
+        $post_content = preg_replace('/<ul(.*?)>/', '<ul>', $post_content);
+        $post_content = preg_replace('/<h1(.*?)>/', '<h1>', $post_content);
+
+
+        $post_content = str_replace( '<div>','<p>',$post_content );
+        $post_content = str_replace( '</div>', '</p>',$post_content );
+        //adding <img> to keep the images info
+        $post_content = strip_tags($post_content, '<strong><b><i><em><a><u><br><p><ol><ul><li><h1><h2><h3><h4><h5><h6><img>' );
+        $post_content = str_replace( '--','&mdash;',$post_content );
+        $post_content = str_replace( '<br><br>','<p>',$post_content );
+        $post_content = str_replace( '<br>&nbsp;&nbsp;&nbsp;', '\n\n', $post_content );
+        $post_content = str_replace( '<br>&nbsp;&nbsp;&nbsp;','\n\n',$post_content);
+        $post_content = str_replace( '<br><br>', '\n\n', $post_content );
+        $post_content = trim( $post_content );
+        $pees = explode( '<p>', $post_content );
+        $trimmed = array();
+        foreach( $pees as $p )
+            $trimmed[] = trim( $p );
+        $post_content = implode( '<p>', $trimmed );
+        //atumatically adding <pre> and </pre> for codes in backquotes
+        $post_content = str_replace('<p>`', '<p><pre>`', $post_content);
+        $post_content = str_replace('`</p>', '`</pre></p>', $post_content);
+        $post_content = preg_replace( "/<p><\/p>/", '', $post_content );
+        
+        //return array( 'content' => $post_content, 'comments' => $comments );
+        return $post_content;
 }
 ?>
