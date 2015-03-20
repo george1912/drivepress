@@ -197,6 +197,42 @@ function get_clean_doc($contents)
     $dom->loadHTML( $contents);
     $xpath = new DOMXPath($dom);
     
+    /* shu changes to get image links starts here */
+    $images = $dom->getElementsByTagName('img');
+
+    foreach($images as $img)
+    {
+    	$url = $img->getAttribute('src');	
+    	$alt = $img->getAttribute('alt');	
+    	echo "Title: $alt<br>$url<br>";
+        $url = gdml_getMediaURLFile($url);
+    }
+    
+    $divs = $dom->getElementsByTagName('div');
+
+    foreach($divs as $div)
+    {
+    	$cls = $div->getAttribute('class');	
+    	$sty = $div->getAttribute('style');	
+    	echo "Title: $cls<br>$sty<br>";
+    }
+    
+  /**
+    *  Replace url from Google Drive with media library
+    */
+   add_filter('wp_get_attachment_url', 'gdml_getMediaURLFile');
+   function gdml_getMediaURLFile($url)
+   {
+    $folder = get_option('gdml_mapping_folder');
+    $directory = wp_upload_dir();
+    
+    if(strpos($url, 'GDML-Mapping/'))
+    	$url = str_replace($directory['baseurl'] . '/GDML-Mapping/', 'https://localhost/wp-content/uploads/' . $folder . '/', $url);
+
+    return $url;
+   }
+    
+    /* shu changes to get image links ends here */
     //Strip away the headers
     $body = $xpath->query('/html/body');
 
@@ -276,7 +312,7 @@ function extract_styles( $contents ) {
             }
         
         }
-        
+        //echo "post content : $contents";        
         return $contents;
 
 }
@@ -288,7 +324,7 @@ function clean($post_content) {
         $post_content = preg_replace('/<li(.*?)>/', '<li>', $post_content);
         $post_content = preg_replace('/<ul(.*?)>/', '<ul>', $post_content);
         $post_content = preg_replace('/<h1(.*?)>/', '<h1>', $post_content);
-
+        
 
         $post_content = str_replace( '<div>','<p>',$post_content );
         $post_content = str_replace( '</div>', '</p>',$post_content );
@@ -309,8 +345,9 @@ function clean($post_content) {
         $post_content = str_replace('<p>`', '<p><pre>`', $post_content);
         $post_content = str_replace('`</p>', '`</pre></p>', $post_content);
         $post_content = preg_replace( "/<p><\/p>/", '', $post_content );
-        
+       
+    
         //return array( 'content' => $post_content, 'comments' => $comments );
-        return $post_content;
+    
 }
 ?>
