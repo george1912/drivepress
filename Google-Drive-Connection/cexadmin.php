@@ -24,7 +24,7 @@ function cexdrive_settings_page()
             $about=$service->about->get(array());
             $user=$about->getUser();
                         
-           var_dump($token);
+           //var_dump($token);
             
             // Store credentials
             if($user['emailAddress'])
@@ -69,7 +69,7 @@ function cexdrive_settings_page()
             $created=$settings->created;
 
             if( ( $expires_in + $created - time() ) > 0){
-                echo "retrive existing access_token";
+                echo "retrieve existing access_token";
                     $token=array(
                         'access_token'=> $settings->access_token,
                         'expires_in' => $settings->expires_in,
@@ -82,56 +82,62 @@ function cexdrive_settings_page()
             else{
                 echo 'Try to refresh token'; // Debug
                 //refresh token
-                if(isset($settings->access_token)){
-                    //$client->refreshToken($settings->access_token);
-                    $client->refreshToken($settings->refresh_token);
-                    $token_json=$client->getAccessToken();
-                    $token=json_decode($token_json,true);
-                    $settings= cexdrive_update_config($token); 
-                    $client->setAccessToken($token_json);
-                    $service = new Google_Service_Drive($client);
+                try{
+                    if(isset($settings->access_token)){
+                        //$client->refreshToken($settings->access_token);
+                        $client->refreshToken($settings->refresh_token);
+                        $token_json=$client->getAccessToken();
+                        $token=json_decode($token_json,true);
+                        $settings= cexdrive_update_config($token); 
+                        $client->setAccessToken($token_json);
+                        $service = new Google_Service_Drive($client);
+                    }
+                    else{
+                        echo "error: token is not set!";
+                    }
                 }
-                else{
-                    echo "error: token is not set!";
+                catch(exception $e){
+                    $message = "an error occurred" . $e->getMessage()."\n please wait and refresh the page!";
                 }
-            
             }
-            //check if user select a doc to convert
-            if( isset($_GET['DocId']) )
-            {
-                echo "start to convert";
-                $fileId=$_GET['DocId'];
-                try {
-                        $file = $service->files->get($fileId);
-                        /*
-                        print "Title: " . $file->getTitle();
-                        print "Description: " . $file->getDescription();
-                        print "MIME type: " . $file->getMimeType();
-                        */
-                      } 
-                catch (Exception $e) {
-                        print "An error occurred: " . $e->getMessage();
-                      }
-
-                $downloadUrl = $file->getExportLinks()['text/html'];
-                #echo $downloadUrl;
-
-                if ($downloadUrl) {
-                    $request = new Google_Http_Request($downloadUrl, 'GET', null, null);
-                    //$rest=new Google_Http_REST();
-                    //$content=$rest->doExecute($client,$request);
-                    $curl=new Google_IO_Curl($client);
-                    $result=$curl->executeRequest($request);
-                    $content=$result[0];
-                }           
-                //var_dump($content);
-                $message = "Converting Document-- Title :{$file->getTitle()}, ID: {$_GET['DocId']} ";
-                $clean_doc= get_clean_doc($content);
-                //echo $clean_doc;
-                publish_to_WordPress($file->title,$clean_doc);
-        
-            } 
+                
     }
+
+    //check if user select a doc to convert
+    if( isset($_GET['DocId']) )
+    {
+        echo "start to convert";
+        $fileId=$_GET['DocId'];
+        try {
+                $file = $service->files->get($fileId);
+                /*
+                print "Title: " . $file->getTitle();
+                print "Description: " . $file->getDescription();
+                print "MIME type: " . $file->getMimeType();
+                */
+              } 
+        catch (Exception $e) {
+                print "An error occurred: " . $e->getMessage();
+              }
+
+        $downloadUrl = $file->getExportLinks()['text/html'];
+        #echo $downloadUrl;
+
+        if ($downloadUrl) {
+            $request = new Google_Http_Request($downloadUrl, 'GET', null, null);
+            //$rest=new Google_Http_REST();
+            //$content=$rest->doExecute($client,$request);
+            $curl=new Google_IO_Curl($client);
+            $result=$curl->executeRequest($request);
+            $content=$result[0];
+        }           
+        //var_dump($content);
+        $message = "Converting Document-- Title :{$file->getTitle()}, ID: {$_GET['DocId']} ";
+        //return cleaned css(array format) and body html
+        $clean_doc= get_clean_doc($content);
+        publish_to_WordPress($file->title,$clean_doc);
+
+    } 
     
        
 ?>

@@ -190,21 +190,23 @@ function cexdrive_del_config(){
 function get_clean_doc($contents) 
 {
 
-    $contents=extract_styles($contents);
-    //echo $contents;
+    //Xin: the css in top of raw html file is not well formatted, so we need to first parse the head info
+    //and extract the style info, modify the html with right style before further parsing
     //New domDocument and xPath to get the content
     $dom= new DOMDocument();
     $dom->loadHTML( $contents);
     $xpath = new DOMXPath($dom);
     
-    //Strip away the headers
+    //Strip the headers and body respectively
     $body = $xpath->query('/html/body');
+    $header=$xpath->query('/html/head');
 
-    
     //This is our dirty HTML
-    $dirty_html = $dom->saveXml($body->item(0));
-    
-    //$dirty_html = apply_filters( 'pre_docs_to_wp_purify', $dirty_html );
+    $dirty_html = $dom->saveHTML($body->item(0));
+    $dirty_head=$dom->saveHTML($header->item(0));
+
+    $dirty_html=extract_styles($dirty_head,$dirty_html);
+
     
     //Run that through the purifier
     //$clean_html = $purifier->purify( $dirty_html );
@@ -252,14 +254,17 @@ function cexdrive_load_lib($url)
 
 }
 
-function extract_styles( $contents ) {
+function extract_styles( $head,$contents ) {
 
         //PHP doesn't honor lazy matches very well, apparently, so add newlines
-        $contents = str_replace( '}', "}\r\n", $contents );
+        $head = str_replace( '}', "}\r\n", $head );
 
 
-        preg_match_all( '#.c(?P<digit>\d+){(.*?)font-weight:bold(.*?)}#', $contents, $boldmatches );
-        preg_match_all('#.c(?P<digit>\d+){(.*?)font-style:italic(.*?)}#', $contents, $italicmatches);
+        preg_match_all( '#.c(?P<digit>\d+){(.*?)font-weight:bold(.*?)}#', $head, $boldmatches );
+        preg_match_all('#.c(?P<digit>\d+){(.*?)font-style:italic(.*?)}#', $head, $italicmatches);
+        //xin: find the tag for python code
+        preg_match_all('#.c(?P<digit>\d+){(.*?)background-color:\#ff0000(.*?)}#', $head, $pythonmatches);
+
         
         if( !empty( $boldmatches[ 'digit' ] ) ) {
         
@@ -268,32 +273,49 @@ function extract_styles( $contents ) {
             }
         
         }
+
+        
         
         if( !empty( $italicmatches[ 'digit' ] ) ) {
         
             foreach( $italicmatches[ 'digit' ] as $italicclass ) {
-                $contents = preg_replace( '#<span class="(.*?)c' . $italicclass . '(.*?)">(.*?)</span>#s', '<span class="$1c' . $italicclass . '$2"><em>$3</em>', $contents );
+                $contents = preg_replace( '#<span class="(.*?)c' . $italicclass . '(.*?)">(.*?)</span>#s', '<span class="$1c' . $italicclass . '$2"><em>$3</em></span>', $contents );
             }
         
         }
+
+        //xin: modify the raw html in order to distinguish python code from text, wrap in tag <code class="python">
+        if( !empty( $pythonmatches[ 'digit' ] ) ) {
+        
+            foreach( $pythonmatches[ 'digit' ] as $pythonclass ) {
+                $contents =preg_replace( '#<span class="c'.$pythonclass.'">(.*?)</span>#s', '<code class="python">'.'$1'.'</code>', $contents );
+            }
+        
+        }
+
         
         return $contents;
 
 }
 
+
 function clean($post_content) {
+    
+    
         $post_content = str_replace( array( "\r\n", "\n\n", "\r\r", "\n\r" ), "\n", $post_content );
         $post_content = preg_replace('/<div(.*?)>/', '<div>', $post_content);
+        
         $post_content = preg_replace('/<p(.*?)>/', '<p>', $post_content);
         $post_content = preg_replace('/<li(.*?)>/', '<li>', $post_content);
-        $post_content = preg_replace('/<ul(.*?)>/', '<ul>', $post_content);
-        $post_content = preg_replace('/<h1(.*?)>/', '<h1>', $post_content);
-
+        //xin: fix the margin of bulleted list
+        $post_content = preg_replace('/<ul(.*?)>/', '<ul style="padding-left: 36px";>', $post_content);
+        //xin: fix the head link bug
+        $post_content = preg_replace('/<h1(.*?)>(<a(.*?)>)?/', '<h1>', $post_content);
 
         $post_content = str_replace( '<div>','<p>',$post_content );
         $post_content = str_replace( '</div>', '</p>',$post_content );
         //adding <img> to keep the images info
-        $post_content = strip_tags($post_content, '<strong><b><i><em><a><u><br><p><ol><ul><li><h1><h2><h3><h4><h5><h6><img>' );
+        $post_content = strip_tags($post_content, '<strong><b><i><em><a><u><br><p><ol><ul><li><h1><h2><h3><h4><h5><h6><img><code><pre>' );
         $post_content = str_replace( '--','&mdash;',$post_content );
         $post_content = str_replace( '<br><br>','<p>',$post_content );
         $post_content = str_replace( '<br>&nbsp;&nbsp;&nbsp;', '\n\n', $post_content );
@@ -305,12 +327,20 @@ function clean($post_content) {
         foreach( $pees as $p )
             $trimmed[] = trim( $p );
         $post_content = implode( '<p>', $trimmed );
-        //atumatically adding <pre> and </pre> for codes in backquotes
+        
+        //xin: atumatically adding <pre> and </pre> for codes in backquotes 
         $post_content = str_replace('<p>`', '<p><pre>`', $post_content);
         $post_content = str_replace('`</p>', '`</pre></p>', $post_content);
         $post_content = preg_replace( "/<p><\/p>/", '', $post_content );
-        
-        //return array( 'content' => $post_content, 'comments' => $comments );
+        //xin: fix empty line in code snippets
+        $post_content=preg_replace('#</code></p><p><code class="([^>]*)">#', "\n", $post_content);
+        $post_content=preg_replace('#</code><code class="([^>]*)">#', "", $post_content);
+
+        //xin: highlight in crayon format
+        $post_content = str_replace('<code class="python">', '<pre class="lang:python decode:true ">', $post_content);
+        $post_content = str_replace('</code>', '</pre>', $post_content);
+
+
         return $post_content;
 }
 ?>
