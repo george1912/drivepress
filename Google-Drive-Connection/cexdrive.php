@@ -74,6 +74,21 @@ function plugin_activation_cretable() {
 
 
 /**
+ * when plugin is deactivated, drop the data table in database if it is exists
+ * Author Xin Wang
+ */
+register_deactivation_hook( __FILE__, 'pluginUninstall' );
+function pluginUninstall() {
+
+    global $wpdb;
+    $table_name = $wpdb->prefix."Google_Drive_Account";
+
+    //drop the table if it exists
+
+    $wpdb->query("DROP TABLE IF EXISTS $table_name");
+}
+
+/**
  * retreive the registered account informarion of current user.
  * Author Xin Wang
  * 
