@@ -160,12 +160,12 @@ function cexdrive_settings_page()
               <ol>
                  <?php foreach($files_list as $item):?> 
                     <?php if ($item['mimeType']== "application/vnd.google-apps.folder" or $item['mimeType']=='application/vnd.google-apps.document'): 
-                     
-                     echo '<li><span><img src="' . $item['iconLink'] . '" alt="Icon"> <a href="' . $item['embedLink'] . '" target=_self"'  . '">' . $item->title . '</a>';
-                     //echo "<form action=./cexdrive.php' method='get'>";
-                    // echo '<input type="hidden" name="DocId" value=$item["id"]>';
-                     echo "<a href=".$url."&DocId=".$item['id'].">(convert)</a></span></li>";?>
-                     </form>
+                        if (!empty($item['parents'])):
+                             echo '<li><span><img src="' . $item['iconLink'] . '" alt="Icon"> <a href="' . $item['embedLink'] . '" target=_self"'  . '">' . $item->title . '</a>';
+                             //echo "<form action=./cexdrive.php' method='get'>";
+                             // echo '<input type="hidden" name="DocId" value=$item["id"]>';
+                             echo "<a href=".$url."&DocId=".$item['id'].">(convert)</a></span></li>";?>
+                    <?php endif; ?>
                  <?php endif; ?>
                  <?php endforeach; ?>
                  </ol>
