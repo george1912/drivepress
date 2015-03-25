@@ -245,9 +245,11 @@ function publish_to_WordPress ( $title, $content ) {
                    
             //If you want all posts to be auto-published, for example, you can add a filter here
             //$post_array = apply_filters( 'wp_insert_post_data ', $post_array );
+            echo $post_array['post_author'];
             $post_array['post_content']=clean($post_array['post_content']);
             //Add
-            $post_id = wp_insert_post( $post_array );           
+            $post_id = wp_insert_post( $post_array );
+            return $post_id;      
     
 }
 /**

@@ -110,11 +110,6 @@ function cexdrive_settings_page()
         $fileId=$_GET['DocId'];
         try {
                 $file = $service->files->get($fileId);
-                /*
-                print "Title: " . $file->getTitle();
-                print "Description: " . $file->getDescription();
-                print "MIME type: " . $file->getMimeType();
-                */
               } 
         catch (Exception $e) {
                 print "An error occurred: " . $e->getMessage();
@@ -125,18 +120,26 @@ function cexdrive_settings_page()
 
         if ($downloadUrl) {
             $request = new Google_Http_Request($downloadUrl, 'GET', null, null);
-            //$rest=new Google_Http_REST();
-            //$content=$rest->doExecute($client,$request);
-            $curl=new Google_IO_Curl($client);
-            $result=$curl->executeRequest($request);
-            $content=$result[0];
-        }           
+            $httpRequest = $service->getClient()->getAuth()->authenticatedRequest($request);
+            if ($httpRequest->getResponseHttpCode() == 200) {
+                  $content= $httpRequest->getResponseBody();
+                } else {
+                  // An error occurred.
+                $message = "an error occurred when fetching teh file".$fileId;
+                }
+              } else {
+                // The file doesn't have any content stored on Drive.
+                $message = "file doesn't exist".$fileId;
+            }    
         //var_dump($content);
         $message = "Converting Document-- Title :{$file->getTitle()}, ID: {$_GET['DocId']} ";
         //return cleaned css(array format) and body html
         $clean_doc= get_clean_doc($content);
-        publish_to_WordPress($file->title,$clean_doc);
-
+        $post_id=publish_to_WordPress($file->title,$clean_doc);
+        /*
+        $location=admin_url('post.php?post='.$post_id.'&action=edit');
+        wp_redirect( $location, 302 );
+        exit;*/
     } 
     
        
