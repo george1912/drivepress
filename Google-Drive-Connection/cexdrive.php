@@ -223,31 +223,6 @@ function get_clean_doc($contents) {
 }
 
 /**
- * create a draft post in wordpress
- * 
- * @param string title of google doc
- * @param array content of google doc in html
- * @param array custom field
- */
-function publish_to_WordPress ( $title, $content ) {
-    //If the username in gdocs matches the username in WordPress, it will automatically apply the correct username            
-    $post_array = array(
-        'post_title' => $title,
-        'post_content' => $content,
-        'post_author' => wp_get_current_user()->display_name
-    );
-           
-    //If you want all posts to be auto-published, for example, you can add a filter here
-    //$post_array = apply_filters( 'wp_insert_post_data ', $post_array );
-    echo $post_array['post_author'];
-    $post_array['post_conten']=clean($post_array['post_content']);
-    //Add
-    $post_id = wp_insert_post( $post_array );
-    return $post_id;      
-    
-}
-
-/**
  * Initializes the Google Client.
  * Author Xin Wang
  * 
@@ -267,6 +242,32 @@ function cexdrive_load_lib($url){
 
 
 /**
+ * create a draft post in wordpress
+ * 
+ * @param string title of google doc
+ * @param array content of google doc in html format
+ * @return string id of post 
+ */
+function publish_to_WordPress ( $title, $content ) {
+    //If the username in gdocs matches the username in WordPress, it will automatically apply the correct username            
+    $post_array = array(
+        'post_title' => $title,
+        'post_content' => $content,
+        'post_author' => wp_get_current_user()->display_name
+    );
+           
+    //If you want all posts to be auto-published, for example, you can add a filter here
+    //$post_array = apply_filters( 'wp_insert_post_data ', $post_array );
+    echo $post_array['post_author'];
+    $post_array['post_conten']=clean($post_array['post_content']);
+    //Add
+    $post_id = wp_insert_post( $post_array );
+    return $post_id;      
+    
+}
+
+
+/**
  * parse the raw html download from google deive api
  * find corresponding css style information for each element
  *
@@ -280,30 +281,23 @@ function extract_styles( $head,$contents ) {
 
     //PHP doesn't honor lazy matches very well, apparently, so add newlines
     $head = str_replace( '}', "}\r\n", $head );
-
-
     preg_match_all( '#.c(?P<digit>\d+){(.*?)font-weight:bold(.*?)}#', $head, $boldmatches );
     preg_match_all('#.c(?P<digit>\d+){(.*?)font-style:italic(.*?)}#', $head, $italicmatches);
     //xin: find the tag for python code
     preg_match_all('#.c(?P<digit>\d+){(.*?)background-color:\#ff0000(.*?)}#', $head, $pythonmatches);
-
 
     if( !empty( $boldmatches[ 'digit' ] ) ) {
 
         foreach( $boldmatches[ 'digit' ] as $boldclass ) {
             $contents = preg_replace( '#<span class="(.*?)c' . $boldclass . '(.*?)">(.*?)</span>#s', '<span class="$1c' . $boldclass . '$2"><strong>$3</strong></span>', $contents );
         }
-
     }
-
-
 
     if( !empty( $italicmatches[ 'digit' ] ) ) {
 
         foreach( $italicmatches[ 'digit' ] as $italicclass ) {
             $contents = preg_replace( '#<span class="(.*?)c' . $italicclass . '(.*?)">(.*?)</span>#s', '<span class="$1c' . $italicclass . '$2"><em>$3</em></span>', $contents );
         }
-
     }
 
     //xin: modify the raw html in order to distinguish python code from text, wrap in tag <code class="python">
@@ -312,12 +306,9 @@ function extract_styles( $head,$contents ) {
         foreach( $pythonmatches[ 'digit' ] as $pythonclass ) {
             $contents =preg_replace( '#<span class="c'.$pythonclass.'">(.*?)</span>#s', '<code class="python">'.'$1'.'</code>', $contents );
         }
-
     }
 
-
     return $contents;
-
 }
 
 
