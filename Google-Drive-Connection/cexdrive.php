@@ -249,18 +249,16 @@ function cexdrive_load_lib($url){
  * @return string id of post 
  */
 function publish_to_WordPress ( $title, $content ) {
-    //If the username in gdocs matches the username in WordPress, it will automatically apply the correct username            
+
+    // add display name of user
     $post_array = array(
         'post_title' => $title,
         'post_content' => $content,
         'post_author' => wp_get_current_user()->display_name
     );
-           
-    //If you want all posts to be auto-published, for example, you can add a filter here
-    //$post_array = apply_filters( 'wp_insert_post_data ', $post_array );
-    echo $post_array['post_author'];
+
+    // clean the content before insert into wordpress database
     $post_array['post_conten']=clean($post_array['post_content']);
-    //Add
     $post_id = wp_insert_post( $post_array );
     return $post_id;      
     
