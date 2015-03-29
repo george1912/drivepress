@@ -123,22 +123,21 @@ function cexdrive_update_config($token){
     //get current account records of user
     $current=cexdrive_get_config();
     if ($current){
-		$wpdb->update( 
-			$table_name, 
-			array( 
-				'access_token' =>$token['access_token'] ,	// string
-				'expires_in' => $token['expires_in'],	// integer (number) 
-				'created' => $token['created']
-			), 
-			array( 'id' => $id ), 
-			array( 
-				'%s',	// value1
-				'%d',
-				'%d'	// value2
-			), 
-			array( '%d' ) 
-		);
-
+        $wpdb->update( 
+            $table_name, 
+            array( 
+                'access_token' =>$token['access_token'] ,	// string
+                'expires_in' => $token['expires_in'],	// integer (number) 
+                'created' => $token['created']
+            ), 
+            array( 'id' => $id ), 
+            array( 
+                '%s',
+                '%d',
+                '%d'
+            ), 
+            array( '%d' ) 
+        );
     }
     //get the most update records
     $current=cexdrive_get_config();
@@ -247,6 +246,7 @@ function publish_to_WordPress ( $title, $content ) {
     return $post_id;      
     
 }
+
 /**
  * Initializes the Google Client.
  * Author Xin Wang
@@ -255,17 +255,27 @@ function publish_to_WordPress ( $title, $content ) {
  * @return object The Google Client object.
  */
 function cexdrive_load_lib($url){
-	require_once dirname(__FILE__). '/google-api-php-client/src/Google/autoload.php';
-	$client = new Google_Client();
-	$client->setScopes(array('https://www.googleapis.com/auth/drive.readonly','https://www.googleapis.com/auth/drive'));
+    require_once dirname(__FILE__). '/google-api-php-client/src/Google/autoload.php';
+    $client = new Google_Client();
+    $client->setScopes(array('https://www.googleapis.com/auth/drive.readonly','https://www.googleapis.com/auth/drive'));
     $client->setRedirectUri($url);
     $client->setAccessType('offline');
     $client->setApprovalPrompt('force');
-	return $client;
+    return $client;
 
 }
 
 
+/**
+ * parse the raw html download from google deive api
+ * find corresponding css style information for each element
+ *
+ * Author Xin Wang
+ * 
+ * @param string $head, content between tag <head>
+ * @param string $contents, content between tag <body>
+ * @return string processed body content
+ */
 function extract_styles( $head,$contents ) {
 
     //PHP doesn't honor lazy matches very well, apparently, so add newlines
@@ -310,6 +320,15 @@ function extract_styles( $head,$contents ) {
 
 }
 
+
+/**
+ * clean  html content, only leave with tags supoorted by wordpress
+ *
+ * Author Xin Wang
+ * 
+ * @param string $post_content, body content of a file
+ * @return string cleaned content
+ */
 
 function clean($post_content) {
     
