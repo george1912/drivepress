@@ -180,7 +180,109 @@ function cexdrive_del_config(){
 	//$wpdb->delete( $table_name, array( 'id' => 1 ), array( '%d' ) );
 }
 
+function fetch_image_contents($url) {
+     if ( function_exists("curl_init") ) {
+         return curl_fetch_image_from_url($url);
+	} elseif ( ini_get("allow_url_fopen") ) {
+	  return fopen_fetch_image_from_url($url);
+	}
+}
+        
+function curl_fetch_image_from_url($URL) {
+    $c = curl_init();
+    curl_setopt($c, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($c, CURLOPT_URL, $URL);
+    $contents = curl_exec($c);
+    curl_close($c);
 
+    if ($contents) {
+        return $contents;
+    }
+
+    return FALSE;
+}
+
+function fopen_fetch_image_from_url($url) {
+	$image = file_get_contents($url, false, $context);
+	       if ($contents) {
+        return $contents;
+    }
+
+    return FALSE;
+}
+	
+
+
+
+/* shu changes to get image links starts here */
+
+ //add_filter('wp_get_attachment_url', 'gdml_getMediaURLFile');
+/*add_filter( 'media_upload_tabs', 'media_upload_tabs'); //hide media tabs
+add_filter( 'media_send_to_editor', 'media_send_to_editor' ); //to modify the string send by javascript
+add_filter( 'media_upload_form_url', 'media_upload_form_url' ); //used to send new parameter*/
+
+  /**
+    *  Store and Replace url from Google Drive with media library
+    */
+
+function media_upload_form_url($imageUrl)
+{
+    //$directory = wp_upload_dir();
+    //echo $directory['path'];
+    //$upload_url = ( $directory['url'] );
+    //$upload_url_alt = ( $directory['baseurl'] . $directory['subdir'] );
+    $uploads = wp_upload_dir();
+    $post_id = isset($_GET['post_id'])? (int) $_GET['post_id'] : 0;
+    $filename = substr($imageUrl, (strrpos($imageUrl, '/'))+1);
+    $ext = pathinfo( basename($imageurl) , PATHINFO_EXTENSION);
+    $wp_filetype = wp_check_filetype($filename, null );
+    // Generate unique file name
+    $filename = wp_unique_filename( $uploads['path'], $filename );
+    
+    echo "filename:$filename<br>";
+
+    // Move the file to the uploads dir
+    $fullpathfilename = $uploads['path'] . "/$filename";
+    
+    echo "filename:$fullpathfilename<br>";    
+    
+    try {
+        /*if ( !substr_count($wp_filetype['type'], "image") ) {
+	throw new Exception( basename($imageurl) . ' is not a valid image. ' . $wp_filetype['type']  . '' );
+	}*/
+			
+	$image_string = fetch_image_contents($imageurl);
+	$fileSaved = file_put_contents($uploads['path'] . "/" . $filename, $image_string);
+				
+         /*if ( !$fileSaved ) {
+	  throw new Exception("The file cannot be saved.");
+	  }*/
+				
+		$attachment = array(
+			 'post_mime_type' => $wp_filetype['type'],
+			 'post_title' => preg_replace('/\.[^.]+$/', '', $filename),
+			 'post_content' => '',
+			 'post_status' => 'inherit',
+			 'guid' => $uploads['url'] . "/" . $filename
+			);
+		$attach_id = wp_insert_attachment( $attachment, $fullpathfilename, $post_id );
+		if ( !$attach_id ) {
+			throw new Exception("Failed to save record into database.");
+			}
+			require_once(ABSPATH . "wp-admin" . '/includes/image.php');
+			$attach_data = wp_generate_attachment_metadata( $attach_id, $fullpathfilename );
+			wp_update_attachment_metadata( $attach_id,  $attach_data );
+			
+	      } catch (Exception $e) {
+		echo $e->getMessage();
+			
+            }
+    //echo $upload_url . '<br />'; 
+    //echo $upload_url_alt . '<br />';
+    return null;
+}
+
+/* shu changes to get image links ends here */
 /**
  * parse the raw html content of google doc.
  * 
@@ -197,15 +299,21 @@ function get_clean_doc($contents)
     $dom->loadHTML( $contents);
     $xpath = new DOMXPath($dom);
     
-    /* shu changes to get image links starts here */
+    /* shubha changes to get image links starts here */
     $images = $dom->getElementsByTagName('img');
 
     foreach($images as $img)
     {
     	$url = $img->getAttribute('src');	
     	$alt = $img->getAttribute('alt');	
-    	echo "Title: $alt<br>$url<br>";
-        $url = gdml_getMediaURLFile($url);
+        //echo "Test: $alt<br>$url<br>";
+        // get the image width to align the images
+           $imageSize = getimagesize($url);
+           $imageWidth = $imageSize[0];
+           $imageHeight = $imageSize[1];
+            //echo "imagesize :$imageWidth<br>$imageHeight<br>";
+            $urlfinal = media_upload_form_url($url);
+            //echo "urlfinal :$urlfinal<br>";
     }
     
     $divs = $dom->getElementsByTagName('div');
@@ -214,25 +322,12 @@ function get_clean_doc($contents)
     {
     	$cls = $div->getAttribute('class');	
     	$sty = $div->getAttribute('style');	
-    	echo "Title: $cls<br>$sty<br>";
+    	//echo "Test: $cls<br>$sty<br>";
     }
     
-  /**
-    *  Replace url from Google Drive with media library
-    */
-   add_filter('wp_get_attachment_url', 'gdml_getMediaURLFile');
-   function gdml_getMediaURLFile($url)
-   {
-    $folder = get_option('gdml_mapping_folder');
-    $directory = wp_upload_dir();
-    
-    if(strpos($url, 'GDML-Mapping/'))
-    	$url = str_replace($directory['baseurl'] . '/GDML-Mapping/', 'https://localhost/wp-content/uploads/' . $folder . '/', $url);
 
-    return $url;
-   }
+    /* shubha changes to get image links ends here */
     
-    /* shu changes to get image links ends here */
     //Strip away the headers
     $body = $xpath->query('/html/body');
 
@@ -312,7 +407,7 @@ function extract_styles( $contents ) {
             }
         
         }
-        //echo "post content : $contents";        
+        
         return $contents;
 
 }
@@ -324,7 +419,7 @@ function clean($post_content) {
         $post_content = preg_replace('/<li(.*?)>/', '<li>', $post_content);
         $post_content = preg_replace('/<ul(.*?)>/', '<ul>', $post_content);
         $post_content = preg_replace('/<h1(.*?)>/', '<h1>', $post_content);
-        
+
 
         $post_content = str_replace( '<div>','<p>',$post_content );
         $post_content = str_replace( '</div>', '</p>',$post_content );
@@ -345,9 +440,8 @@ function clean($post_content) {
         $post_content = str_replace('<p>`', '<p><pre>`', $post_content);
         $post_content = str_replace('`</p>', '`</pre></p>', $post_content);
         $post_content = preg_replace( "/<p><\/p>/", '', $post_content );
-       
-    
+        
         //return array( 'content' => $post_content, 'comments' => $comments );
-    
+        return $post_content;
 }
 ?>
