@@ -3,18 +3,15 @@
  * Displays the google drive dispaly page.
  * Author: Xin Wang
  */
-function cexdrive_settings_page() 
-{
+function cexdrive_settings_page() {
     
-	$settings = cexdrive_get_config(); // Gets the current config
+    $settings = cexdrive_get_config(); // Gets the current config
     //var_dump($settings->access_token);
     $url = admin_url( '/options-general.php?page=' . basename( dirname(__FILE__) ) . '/cexdrive.php' ); // Sets the current URL
     $client = cexdrive_load_lib($url); // Initialize Google Drive Access   
     // Account authorization handler
-    if( isset($_GET['code']) )
-    {
-        try
-        {
+    if( isset($_GET['code']) ){
+        try{
             
             // Authenticate
             $token_json = $client->authenticate($_GET['code']);
@@ -27,28 +24,25 @@ function cexdrive_settings_page()
            //var_dump($token);
             
             // Store credentials
-            if($user['emailAddress'])
-            {
+            if($user['emailAddress']){
             // Data to insert
                 $data = array(
                      //'user' => wp_get_current_user()->ID,
                      'token' => $token,
                      'user'  => $user['emailAddress'],
-            );
+                );
                 //$settings = cexdrive_set_config(array($user['emailAddress'] => $data));
                 $settings=cexdrive_insert_config($data);
                 $message = "User {$user['emailAddress']} added successfully.";
             }            
         }
-        catch(exception $e)
-        {
+        catch(exception $e){
             $error = 'The provided token is invalid!';
         }
     }
 
         // Removing a user
-    else if( isset($_GET['remove']) && $settings )
-    {
+    else if( isset($_GET['remove']) && $settings ){
         echo "start to remove";
         $name = $_GET['remove'];
         cexdrive_del_config();
@@ -59,61 +53,56 @@ function cexdrive_settings_page()
     } 
 
     //check if token has been stored, if nothing is recorded, indicate first time login
-    if ($settings and !empty($settings))
-    { 
-        //try{
-            //var_dump($settings);
-            //check if token has been stored
-            //if($client->isAccessTokenExpired()) {
-            $expires_in=$settings->expires_in;
-            $created=$settings->created;
+    if ($settings and !empty($settings)){ 
 
-            if( ( $expires_in + $created - time() ) > 0){
+        $expires_in=$settings->expires_in;
+        $created=$settings->created;
+
+        if( ( $expires_in + $created - time() ) > 0){
                 echo "retrieve existing access_token";
-                    $token=array(
-                        'access_token'=> $settings->access_token,
-                        'expires_in' => $settings->expires_in,
-                        'created' => $settings->created
-                        );
-                    $token_json=json_encode($token);
+                $token=array(
+                    'access_token'=> $settings->access_token,
+                    'expires_in' => $settings->expires_in,
+                    'created' => $settings->created
+                    );
+                $token_json=json_encode($token);
+                $client->setAccessToken($token_json);
+                $service = new Google_Service_Drive($client);
+        } 
+        else{
+            echo 'Try to refresh token'; // Debug
+            //refresh token
+            try{
+                if(isset($settings->access_token)){
+                    //$client->refreshToken($settings->access_token);
+                    $client->refreshToken($settings->refresh_token);
+                    $token_json=$client->getAccessToken();
+                    $token=json_decode($token_json,true);
+                    $settings= cexdrive_update_config($token); 
                     $client->setAccessToken($token_json);
                     $service = new Google_Service_Drive($client);
-            } 
-            else{
-                echo 'Try to refresh token'; // Debug
-                //refresh token
-                try{
-                    if(isset($settings->access_token)){
-                        //$client->refreshToken($settings->access_token);
-                        $client->refreshToken($settings->refresh_token);
-                        $token_json=$client->getAccessToken();
-                        $token=json_decode($token_json,true);
-                        $settings= cexdrive_update_config($token); 
-                        $client->setAccessToken($token_json);
-                        $service = new Google_Service_Drive($client);
-                    }
-                    else{
-                        echo "error: token is not set!";
-                    }
                 }
-                catch(exception $e){
-                    $message = "an error occurred" . $e->getMessage()."\n please wait and refresh the page!";
+                else{
+                    echo "error: token is not set!";
                 }
             }
+            catch(exception $e){
+                $message = "an error occurred" . $e->getMessage()."\n please wait and refresh the page!";
+            }
+        }
                 
     }
 
     //check if user select a doc to convert
-    if( isset($_GET['DocId']) )
-    {
+    if( isset($_GET['DocId']) ){
         echo "start to convert";
         $fileId=$_GET['DocId'];
-        try {
-                $file = $service->files->get($fileId);
-              } 
+        try{
+            $file = $service->files->get($fileId);
+        } 
         catch (Exception $e) {
                 print "An error occurred: " . $e->getMessage();
-              }
+        }
 
         $downloadUrl = $file->getExportLinks()['text/html'];
         #echo $downloadUrl;
@@ -127,7 +116,8 @@ function cexdrive_settings_page()
                   // An error occurred.
                 $message = "an error occurred when fetching teh file".$fileId;
                 }
-              } else {
+              } 
+            else {
                 // The file doesn't have any content stored on Drive.
                 $message = "file doesn't exist".$fileId;
             }    
