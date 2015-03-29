@@ -172,6 +172,7 @@ function cexdrive_insert_config($data)
  * Author Xin Wang
  * 
  */
+
 function cexdrive_del_config(){
 	global $wpdb;
 	$ID=wp_get_current_user()->ID;
@@ -179,6 +180,14 @@ function cexdrive_del_config(){
 	$wpdb->query(" DELETE FROM ".$table_name." WHERE id = ".$ID);
 	//$wpdb->delete( $table_name, array( 'id' => 1 ), array( '%d' ) );
 }
+
+
+/**
+ * Store and Replace url from Google Drive with media library
+ * Author shubhalakshmi Pai
+ * 
+ */
+
 
 function fetch_image_contents($url) {
      if ( function_exists("curl_init") ) {
@@ -211,19 +220,10 @@ function fopen_fetch_image_from_url($url) {
     return FALSE;
 }
 	
-
-
-
-/* shu changes to get image links starts here */
-
- //add_filter('wp_get_attachment_url', 'gdml_getMediaURLFile');
 /*add_filter( 'media_upload_tabs', 'media_upload_tabs'); //hide media tabs
 add_filter( 'media_send_to_editor', 'media_send_to_editor' ); //to modify the string send by javascript
 add_filter( 'media_upload_form_url', 'media_upload_form_url' ); //used to send new parameter*/
 
-  /**
-    *  Store and Replace url from Google Drive with media library
-    */
 
 function media_upload_form_url($imageUrl)
 {
@@ -282,7 +282,8 @@ function media_upload_form_url($imageUrl)
     return null;
 }
 
-/* shu changes to get image links ends here */
+/* shubha changes to get image links ends here */
+
 /**
  * parse the raw html content of google doc.
  * 
