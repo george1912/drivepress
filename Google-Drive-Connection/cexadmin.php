@@ -1,3 +1,7 @@
+<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
+<script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+<script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+
 <?php
 /**
  * Displays the google drive display page.
@@ -153,6 +157,83 @@ function cexdrive_settings_page()
     <h3>How To Use:</h3>
     <h4>Click on a Google Drive Document to open it in your Google Drive account to edit it.</h4>
     <h4>Click on the <img src='DrivePluginIcons/convert.png'> icon to convert your document into a Wordpress draft.</h4>
+
+
+
+
+
+
+
+    <?php
+    $array  = array('First');
+    $array1  = array(122 => 'Files: gcu201@nyu.edu');
+    $array2  = array('Wordpress Presentation one' , 'Appendix' , 'Files for Database', 'DWDCSVFiles','Is this weird or not?');
+
+    ?>
+    <div id="accordion">
+
+        <?php foreach ($array  as $key=>$val) { ?>
+
+            <h3><?php echo $val; ?></h3>
+
+            <div style="min-height:200px;">
+
+                <div id="accordion<?php echo $key; ?>" class="sub-container-menu">
+
+
+
+
+
+                    <?php foreach($array1 as $key1=>$val1) { ?>
+
+                        <h3><?php echo $val1; ?></h3>
+
+                        <div style="min-height:200px;">
+
+                            <div id="accordion<?php echo $key.'_'.$key1; ?>" class="sub-menu">
+
+                                <?php foreach($array2 as $key2=>$val2) {  ?>
+
+                                    <h3><?php echo $val2; ?></h3>
+
+                                    <div>This is a test doc in side the wordpress presentation folder  </div>
+
+                                <?php } ?>
+
+                            </div>
+
+                        </div>
+                    <?php } ?>
+                </div>
+
+
+
+            </div>
+        <?php } ?>
+    </div>
+
+    <script src="external/jquery/jquery.js"></script>
+    <script src="jquery-ui.js"></script>
+    <script>
+
+        $( "#accordion" ).accordion();
+
+        $(".sub-container-menu").each(function() {
+            $( "#"+$(this).attr('id') ).accordion();
+        });
+
+        $(".sub-menu").each(function() {
+            $( "#"+$(this).attr('id') ).accordion();
+        });
+
+
+    </script>
+
+
+
+
+
+
 
 
 
