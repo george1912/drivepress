@@ -7,26 +7,19 @@
  * Displays the google drive display page.
  * Author: Xin Wang
  */
-function cexdrive_settings_page() 
+function cexdrive_settings_page()
 {
-    //adding in Picture
-    //$image = "/image/convert.png";
-    //$width = 150;
-    //$height = 150;
-
-
-
 
 	$settings = cexdrive_get_config(); // Gets the current config
     //var_dump($settings->access_token);
     $url = admin_url( '/options-general.php?page=' . basename( dirname(__FILE__) ) . '/cexdrive.php' ); // Sets the current URL
-    $client = cexdrive_load_lib($url); // Initialize Google Drive Access   
+    $client = cexdrive_load_lib($url); // Initialize Google Drive Access
     // Account authorization handler
     if( isset($_GET['code']) )
     {
         try
         {
-            
+
             // Authenticate
             $token_json = $client->authenticate($_GET['code']);
             $client->setAccessToken($token_json);
@@ -34,9 +27,9 @@ function cexdrive_settings_page()
             $service = new Google_Service_Drive($client);
             $about=$service->about->get(array());
             $user=$about->getUser();
-                        
+
            //var_dump($token);
-            
+
             // Store credentials
             if($user['emailAddress'])
             {
@@ -49,7 +42,7 @@ function cexdrive_settings_page()
                 //$settings = cexdrive_set_config(array($user['emailAddress'] => $data));
                 $settings=cexdrive_insert_config($data);
                 $message = "User {$user['emailAddress']} added successfully.";
-            }            
+            }
         }
         catch(exception $e)
         {
@@ -64,14 +57,14 @@ function cexdrive_settings_page()
         $name = $_GET['remove'];
         cexdrive_del_config();
         $settings=FALSE;
-        //$client->revokeToken();  
+        //$client->revokeToken();
         $message = "User {$name} was successfully removed.";
 
-    } 
+    }
 
     //check if token has been stored, if nothing is recorded, indicate first time login
     if ($settings and !empty($settings))
-    { 
+    {
         //try{
             //var_dump($settings);
             //check if token has been stored
@@ -89,7 +82,7 @@ function cexdrive_settings_page()
                     $token_json=json_encode($token);
                     $client->setAccessToken($token_json);
                     $service = new Google_Service_Drive($client);
-            } 
+            }
             else{
                 echo 'Try to refresh token'; // Debug
                 //refresh token
@@ -99,7 +92,7 @@ function cexdrive_settings_page()
                         $client->refreshToken($settings->refresh_token);
                         $token_json=$client->getAccessToken();
                         $token=json_decode($token_json,true);
-                        $settings= cexdrive_update_config($token); 
+                        $settings= cexdrive_update_config($token);
                         $client->setAccessToken($token_json);
                         $service = new Google_Service_Drive($client);
                     }
@@ -111,8 +104,10 @@ function cexdrive_settings_page()
                     $message = "an error occurred" . $e->getMessage()."\n please wait and refresh the page!";
                 }
             }
-                
+
     }
+
+
 
     //check if user select a doc to convert
     if( isset($_GET['DocId']) )
@@ -126,7 +121,7 @@ function cexdrive_settings_page()
                 print "Description: " . $file->getDescription();
                 print "MIME type: " . $file->getMimeType();
                 */
-              } 
+              }
         catch (Exception $e) {
                 print "An error occurred: " . $e->getMessage();
               }
@@ -141,28 +136,120 @@ function cexdrive_settings_page()
             $curl=new Google_IO_Curl($client);
             $result=$curl->executeRequest($request);
             $content=$result[0];
-        }           
+        }
         //var_dump($content);
         $message = "Converting Document-- Title :{$file->getTitle()}, ID: {$_GET['DocId']} ";
         //return cleaned css(array format) and body html
         $clean_doc= get_clean_doc($content);
         publish_to_WordPress($file->title,$clean_doc);
 
-    } 
-    
-       
+    }
+
+
 ?>
-<div class="wrap">
-	<h2>Wordpress x Google Drive</h2>
-    <h3>How To Use:</h3>
-    <h4>Click on a Google Drive Document to open it in your Google Drive account to edit it.</h4>
-    <h4>Click on the <img src='DrivePluginIcons/convert.png'> icon to convert your document into a Wordpress draft.</h4>
+
+
+    <h1>Seperated Folders from files, and removed ability to convery folder</h1>
+
+    <div class="wrap">
+        <h2>Testing displaying just folders</h2>
+
+        <h4>Click on the <img src='DrivePluginIcons/convert.png'> icon to convert your document into a Wordpress draft.</h4>
+
+        <?php if( isset($message) ): ?>
+            <div class="updated"><p><?php echo $message; ?></p></div>
+        <?php elseif( isset($error) ): ?>
+            <div class="error"><p><strong><?php echo $error; ?></strong></p></div>
+        <?php endif; ?>
+
+        <?php if($settings === FALSE or empty($settings) ): ?>
+	<p>You have not set up any accounts yet.</p><a href="<?php echo $client->createAuthUrl(); ?>">Add a new account</a></p>
+<?php else: ?>
+
+            <h3>Logged In Drive Account:</h3>
+            <ol>
+                <li><?php echo $settings->email; ?><a href="<?php echo $url; ?>&remove=<?php echo urlencode( $settings->email);?>">(Remove)</a></li>
+            </ol>
+
+
+            <h3> Here are the Folders on your drive:</h3>
+            <?php  $files_list = $service->files->listFiles(array())->getItems(); ?>
+
+            <ol>
+
+                <?php foreach($files_list as $item):?>
+
+                    <?php if ($item['mimeType']== "application/vnd.google-apps.folder"):
+                        if (!empty($item['parents'])):
+                            echo '<li><span> <img src="' . $item['iconLink'] . '" alt="Icon"> <a href="' . $item['embedLink'] . '" target=_self"'  . '">' . $item->title . '</a>';?>
+
+                        <?php endif; ?>
+                    <?php endif; ?>
+                <?php endforeach; ?>
+
+            </ol>
+
+            <h3> Here are the files on your drive:</h3>
+            <?php  $files_list = $service->files->listFiles(array())->getItems(); ?>
+
+            <ol>
+
+                <?php foreach($files_list as $item):?>
+                    <?php if ($item['mimeType']== "application/vnd.google-apps.document"):
+                        if (!empty($item['parents'])):
+                            echo '<li><span><img src="' . $item['iconLink'] . '" alt="Icon"> <a href="' . $item['embedLink'] . '" target=_self"'  . '">' . $item->title . '</a>';
+
+                            //echo "<form action=./cexdrive.php' method='get'>";
+                            // echo '<input type="hidden" name="DocId" value=$item["id"]>';
+                            //edited here /image/google_drive_icon.png
+                            echo "<a href=".$url."&DocId=".$item['id'].">   <img src='DrivePluginIcons/convert.png'>   </a></span></li>";?>
+
+
+
+                        <?php endif; ?>
+                    <?php endif; ?>
+                <?php endforeach; ?>
+
+            </ol>
+
+            <br>
+        <?php endif; ?>
+    </div>
 
 
 
 
+ <h1>attempting to get parent folder with children using an api call</h1>
+ <h3> parents with children:</h3>
+
+            <?php  $files_list = $service->files->listFiles(array())->getItems(); ?>
+            <?php  $children = $service->children->listChildren(root); ?>
+            <ol>
+
+                <?php
+    foreach($children->getItems() as $child):
+        echo 'File Id: ' . $child->getchildLink();?>
 
 
+
+        <?php
+           echo '<li><span><img src="' . $file['iconLink'] . '" alt="Icon"> <a href="' . $file['embedLink'] . '" target=_self"'  . '">' . $file->title . '</a>';
+            echo '<li><span> <img src="' . $child['iconLink'] . '" alt="Icon"> <a href="' . $child['childLink'] . '" target=_self"'  . '">' . $child->id . '</a>';?>
+
+
+
+    <?php
+        if ($file['mimeType']== "application/vnd.google-apps.document"):
+        if (!empty($file['parents'])):
+            echo '<li><span><img src="' . $file['iconLink'] . '" alt="Icon"> <a href="' . $file['embedLink'] . '" target=_self"'  . '">' . $file->title . '</a>';?>
+        <?php endif; ?>
+    <?php endif; ?>
+
+
+
+<?php endforeach; ?>
+
+            </ol>
 
     <?php
     $array  = array('First');
@@ -170,6 +257,7 @@ function cexdrive_settings_page()
     $array2  = array('Wordpress Presentation one' , 'Appendix' , 'Files for Database', 'DWDCSVFiles','Is this weird or not?');
 
     ?>
+
     <div id="accordion">
 
         <?php foreach ($array  as $key=>$val) { ?>
@@ -196,7 +284,21 @@ function cexdrive_settings_page()
 
                                     <h3><?php echo $val2; ?></h3>
 
-                                    <div>This is a test doc in side the wordpress presentation folder  </div>
+                                    <div> <?php foreach($files_list as $item):?>
+                                            //this is pulling out a list of things
+                                            <?php if ($item['mimeType']== "application/vnd.google-apps.folder" or $item['mimeType']=='application/vnd.google-apps.document'):
+                                                if (!empty($item['parents'])):
+                                                    echo '<li><span><img src="' . $item['iconLink'] . '" alt="Icon"> <a href="' . $item['embedLink'] . '" target=_self"'  . '">' . $item->title . '</a>';
+                                                    //echo "<form action=./cexdrive.php' method='get'>";
+                                                    // echo '<input type="hidden" name="DocId" value=$item["id"]>';
+                                                    //edited here /image/google_drive_icon.png
+                                                    echo "<a href=".$url."&DocId=".$item['id'].">   <img src='DrivePluginIcons/convert.png'>   </a></span></li>";?>
+
+
+
+                                                <?php endif; ?>
+                                            <?php endif; ?>
+                                        <?php endforeach; ?> </div>
 
                                 <?php } ?>
 
@@ -211,6 +313,8 @@ function cexdrive_settings_page()
             </div>
         <?php } ?>
     </div>
+
+
 
     <script src="external/jquery/jquery.js"></script>
     <script src="jquery-ui.js"></script>
@@ -235,49 +339,5 @@ function cexdrive_settings_page()
 
 
 
-
-
-
-
-
-
-    <?php if( isset($message) ): ?>
-    <div class="updated"><p><?php echo $message; ?></p></div>
-<?php elseif( isset($error) ): ?>
-    <div class="error"><p><strong><?php echo $error; ?></strong></p></div>    
-<?php endif; ?>	
-<?php if($settings === FALSE or empty($settings) ): ?>
-	<p>You have not set up any accounts yet.</p><a href="<?php echo $client->createAuthUrl(); ?>">Add a new account</a></p>
-<?php else: ?>
-	<h3>Logged In Drive Account:</h3>
-    <ol>
-    <li><?php echo $settings->email; ?><a href="<?php echo $url; ?>&remove=<?php echo urlencode( $settings->email);?>">(Remove)</a></li>
-    </ol>
-
-
-
-
-
-    <h3> Here are the documents on your drive:</h3>
-        <?php  $files_list = $service->files->listFiles(array())->getItems(); ?>
-              <ol>
-                 <?php foreach($files_list as $item):?> 
-                    <?php if ($item['mimeType']== "application/vnd.google-apps.folder" or $item['mimeType']=='application/vnd.google-apps.document'): 
-                        if (!empty($item['parents'])):
-                             echo '<li><span><img src="' . $item['iconLink'] . '" alt="Icon"> <a href="' . $item['embedLink'] . '" target=_self"'  . '">' . $item->title . '</a>';
-                             //echo "<form action=./cexdrive.php' method='get'>";
-                             // echo '<input type="hidden" name="DocId" value=$item["id"]>';
-                            //edited here /image/google_drive_icon.png
-                             echo "<a href=".$url."&DocId=".$item['id'].">   <img src='DrivePluginIcons/convert.png'>   </a></span></li>";?>
-
-
-
-                    <?php endif; ?>
-                 <?php endif; ?>
-                 <?php endforeach; ?>
-                 </ol>
-                <br>
-<?php endif; ?>
-</div>
 <?php
 }
