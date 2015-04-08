@@ -122,7 +122,7 @@ function add_my_custom_button($context) {
   //append the icon
   $context .= "<a class='button' title='{$title}' 
     id = 'pick' style='padding-right: 2px; vertical-align: text-bottom;'
-    href='javascript:void();'>
+    href='javascript:initPicker();'>
     <img src='{$img}' />Google Drive</a>";
   
   return $context;
