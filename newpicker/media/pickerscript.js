@@ -1,10 +1,5 @@
 /**!
  * Google Drive File Picker Example
- * By Daniel Lo Nigro (http://dan.cx/)
- */
-/**!
- * Google Drive File Picker Example
- * By Daniel Lo Nigro (http://dan.cx/)
  */
 (function() {
 	/**
