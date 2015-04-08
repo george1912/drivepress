@@ -97,7 +97,7 @@ function cexdrive_settings_page()
                     }
                 }
                 catch(exception $e){
-                    $message = "an error occurred" . $e->getMessage()."\n please wait and refresh the page!";
+                    $error = "an error occurred" . $e->getMessage()."\n please wait and refresh the page!";
                 }
             }
                 
@@ -125,17 +125,19 @@ function cexdrive_settings_page()
                   $content= $httpRequest->getResponseBody();
                 } else {
                   // An error occurred.
-                $message = "an error occurred when fetching teh file".$fileId;
+                $error = "an error occurred when fetching teh file".$fileId;
                 }
               } else {
                 // The file doesn't have any content stored on Drive.
-                $message = "file doesn't exist".$fileId;
+                $error = "file doesn't exist".$fileId;
             }    
         //var_dump($content);
-        $message = "Converting Document-- Title :{$file->getTitle()}, ID: {$_GET['DocId']} ";
         //return cleaned css(array format) and body html
         $clean_doc= get_clean_doc($content);
         $post_id=publish_to_WordPress($file->title,$clean_doc);
+        $message = "Converting Document Completed-- Title :{$file->getTitle()}, ID: {$_GET['DocId']} ";
+        $redirect=true;
+
         /*
         $errors = FALSE;
  
@@ -168,6 +170,11 @@ function cexdrive_settings_page()
 <?php elseif( isset($error) ): ?>
     <div class="error"><p><strong><?php echo $error; ?></strong></p></div>    
 <?php endif; ?>	
+
+<?php if( isset($redirect) ): ?>
+    <a href= "<?php echo admin_url('post.php?post='.$post_id.'&action=edit'); ?>">Click to Redirect to Post Page</a></p>
+<?php endif; ?> 
+
 <?php if($settings === FALSE or empty($settings) ): ?>
 	<p>You have not set up any accounts yet.</p><a href="<?php echo $client->createAuthUrl(); ?>">Add a new account</a></p>
 <?php else: ?>
