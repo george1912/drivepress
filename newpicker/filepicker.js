@@ -10,7 +10,7 @@ UPLOADCARE_CONF = {
 }
 
 	function initPicker() {
-          alert ("inside picker") 
+         // alert ("inside picker") 
 			var picker = new FilePicker({
                                 
 				apiKey: 'AIzaSyD2MXMpx_c6H38-wk3z097UbVPgg-FakaU',
@@ -19,31 +19,63 @@ UPLOADCARE_CONF = {
                                 
 				onSelect: function(file) {
 					console.log(file);
-					alert('Selected ' + file.id);
-                                        //window.location = "index.php?id=" + file.id;  
-                                        uploaddoc(file);
+					//alert('Selected ' + file.id);
+                                         downloadFile(file,function(Response){
+                                             alert ("Error in downloading file")
+                                         }
+                                          );
                                         //console.log(document.location.protocol);
                                         //console.log(document.location.host);
                                        // window.location = document.location.protocol+'//'+document.location.host+'/wp-content/plugins/newpicker/file.php?id=' + file.id;
                                     }                 
 			});
                         
-                //alert("before post")
-                //console.log(picker);
-               /* $.ajax(document.location.protocol+'//'+document.location.host+'/wp-admin/admin-ajax.php', picker, function(response) {
-			alert('Got this from the server: ' + response);
-                        console.log(response);
-		});*/    
            }
+                
+                
+/**
+ * Upload the file's content to wordpress.
+ *
+ * @param {Fileinfo/content} file Drive File contents..
+ */                
                 
 function uploaddoc(fileInfo) {
   var data = {
     'action': 'google_picker_handle',
-    'file_id': fileInfo.id
+    'file_id': fileInfo
   };
-     alert(fileInfo.id);
+    // alert(fileInfo.id);
   jQuery.post(ajaxurl, data, function(response) {
      alert (response);
   });
 }
+      
+
+      
+/**
+ * Download a file's content.
+ *
+ * @param {File} file Drive File instance.
+ * @param {Function} callback Function to call when the request is complete.
+ */
+function downloadFile(file, callback) {
+  file.downloadUrl = 'https://docs.google.com/feeds/download/documents/export/Export?id='+file.id+'&exportFormat=html' ;
+  //alert (file.downloadUrl);  
+  if (file.downloadUrl) {
+    //alert  ('inside downloadURL');  
+    var accessToken = gapi.auth.getToken().access_token;
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', file.downloadUrl);
+    xhr.setRequestHeader('Authorization', 'Bearer ' + accessToken);
+    xhr.onload = function() {
+      uploaddoc(xhr.responseText);
+    };
+    xhr.onerror = function() {
+      callback(null);
+    };
+    xhr.send();
+  } else {
+    callback(null);
+  }
+}      
       

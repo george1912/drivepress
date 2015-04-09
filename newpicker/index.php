@@ -6,16 +6,7 @@
   License: GPL V3
  */
 
-require_once dirname(__FILE__). '/google-api-php-client/src/Google/autoload.php';
-$client_id = '32802320039-coq0vn95n2btdltq1c15rgj0kj6l45cd.apps.googleusercontent.com';
-$client_secret = 'OJnpD_l0sah9w22yZSfbWdVV';
-$redirect_uri = 'http://localhost/oauth2callback';
-
-$client = new Google_Client();
-$client->setClientId($client_id);
-$client->setClientSecret($client_secret);
-$client->setRedirectUri($redirect_uri);
-$client->addScope("https://www.googleapis.com/auth/drive");
+//require_once 'cexdrive.php';
 //$service = new Google_Service_Drive($client);
 //add a button to the content editor, next to the media button
 //this button will show a popup that contains inline content
@@ -52,36 +43,28 @@ function _googlepicker_get_js_cfg() {
 /*
  * Get file from google drive
  */
-function google_picker_attach($fileID) {
+function google_picker_attach($content) {
     
-                echo "start to convert";
-                try {
-                       $file = $service->files->get($file_id);
-                   }
-                catch (Exception $e) {
-                        print "An error occurred: " . $e->getMessage();
-                   }
-                $downloadUrl = $file->getExportLinks()['text/html'];
-                #echo $downloadUrl;
-
-                if ($downloadUrl) {
-                    $request = new Google_Http_Request($downloadUrl, 'GET', null, null);
-                    //$rest=new Google_Http_REST();
-                    //$content=$rest->doExecute($client,$request);
-                    $curl=new Google_IO_Curl($client);
-                    $result=$curl->executeRequest($request);
-                    $content=$result[0];
-                  }         
+                //echo "start to convert";
                 //var_dump($content);
                 $clean_doc= get_clean_doc($content);
+                // echo "Converting Document";
                 $post_id=publish_to_WordPress($file->title,$clean_doc);  
-                $message = "Converting Document-- Title :{$file->getTitle()}, ID: $fileID} ";
-                $redirect=true;
-                
+                //$message = "Converting Document-- Title :{$file->getTitle()}, ID: $fileID} ";
+                //echo $post_id;
+                if ( $post_id ) {
+                  $permalink = get_permalink( $post_id );
+                   wp_redirect( $permalink );
+                   exit;
+                  }
+                //wp_redirect( 'http://localhost/wp-admin/post.php?post='.$post_id.'&action=edit', 301 );
                 //echo $clean_doc;
                 //publish_to_WordPress($file->title,$clean_doc);
-        
+
+                //return get_permalink( $post->$post_id );
     }
+
+
 
 add_action('wp_ajax_google_picker_handle', 'google_picker_handle');
 function google_picker_handle() {
@@ -97,12 +80,12 @@ file_put_contents('token.json', $client->authenticate());
 $client->setAccessToken(file_get_contents('token.json'));
 */
 //$service = new apiDriveService($client);    
-$service = new Google_Service_Drive($client);
+//$service = new Google_Service_Drive($client);
     $file_id = $_POST['file_id'];
-    echo $file_id;
+    //var_dump($file_id);
      
     $attachment_id = google_picker_attach($file_id);
-    echo "{\"attach_id\": $attachment_id}";     
+    //echo "{\"attach_id\": $attachment_id}";     
     die;
 }
 
