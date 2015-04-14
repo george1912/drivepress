@@ -135,6 +135,7 @@ function cexdrive_settings_page()
         //return cleaned css(array format) and body html
         $clean_doc= get_clean_doc($content);
         $post_id=publish_to_WordPress($file->title,$clean_doc);
+        //$post_id=publish_to_WordPress(getTitle($clean_doc),$clean_doc);
         $message = "Converting Document Completed-- Title :{$file->getTitle()}, ID: {$_GET['DocId']} ";
         $redirect=true;
 

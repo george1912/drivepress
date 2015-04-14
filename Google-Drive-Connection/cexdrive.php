@@ -365,7 +365,7 @@ function publish_to_WordPress ( $title, $content ) {
                    
             //If you want all posts to be auto-published, for example, you can add a filter here
             //$post_array = apply_filters( 'wp_insert_post_data ', $post_array );
-            echo $post_array['post_author'];
+            //echo $post_array['post_author'];
             $post_array['post_content']=clean($post_array['post_content']);
             //Add
             $post_id = wp_insert_post( $post_array );
@@ -474,26 +474,14 @@ function clean($post_content) {
         foreach( $pees as $p )
             $trimmed[] = trim( $p );
         $post_content = implode( '<p>', $trimmed );
+
+        //Xin: extract code snippets and hightlight in crayon format
+        $post_content=preg_replace('#</p><p>```end```</p>#s', '</pre>', $post_content);
+        $post_content=preg_replace('#<p>```(.*?)```</p><p>#s', '<pre class="lang:'."$1".' decode:true ">', $post_content);
+        $post_content=preg_replace( "#<\/p><p>#s", "\n", $post_content );
         
-        //xin: atumatically adding <pre> and </pre> for codes in backquotes 
-        $post_content = str_replace('<p>`', '<p><pre>`', $post_content);
-        $post_content = str_replace('`</p>', '`</pre></p>', $post_content);
-        $post_content = preg_replace( "/<p><\/p>/", '', $post_content );
-        //xin: fix empty line in code snippets
-        $post_content=preg_replace('#</code></p><p><code class="([^>]*)">#', "\n", $post_content);
-        $post_content=preg_replace('#</code><code class="([^>]*)">#', "", $post_content);
-
-        //xin: highlight in crayon format
-        //$post_content = str_replace('<code class="python">', '<pre class="lang:python decode:true ">', $post_content);
-        //$post_content = str_replace('</code>', '</pre>', $post_content);
-
-        $post_content = preg_replace('#<code class="(.*)">#', '<pre class="lang:'."$1".' decode:true ">', $post_content);
-        $post_content = str_replace('</code>', '</pre>', $post_content);
-
-        //Xin: convert the code tag ... ...
-        $post_content=preg_replace('#</p><p>@@@end@@@</p>#s', '</pre>', $post_content);
-        $post_content=preg_replace('#<p>@@@(.*?)@@@</p><p>#s', '<pre class="lang:'."$1".' decode:true ">', $post_content);
-        $post_content=preg_replace( "#<\/p><p>#", "\n", $post_content );
+        //Xin: replace link direct to page source
+        $post_content=preg_replace('#<a(.*?)href="http(.?)://www.google.com/url(.)q=(.*?)&amp(.*?)>#', '<a href='.urldecode("$4").'>', urldecode($post_content));
 
         //Xin: embed youtube video link
         $post_content=preg_replace('#<p>http(.*?)www.youtube.com/watch.v=(.*?)</p>#',
