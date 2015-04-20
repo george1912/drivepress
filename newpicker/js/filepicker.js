@@ -39,10 +39,11 @@ UPLOADCARE_CONF = {
  * @param {Fileinfo/content} file Drive File contents..
  */                
                 
-function uploaddoc(fileInfo) {
+function uploaddoc(fileInfo,title) {
   var data = {
     'action': 'google_picker_handle',
-    'file_id': fileInfo
+    'file_id': fileInfo,
+    'title':title
   };
     // alert(fileInfo.id);
   jQuery.post(ajaxurl, data, function(response) {
@@ -68,7 +69,7 @@ function downloadFile(file, callback) {
     xhr.open('GET', file.downloadUrl);
     xhr.setRequestHeader('Authorization', 'Bearer ' + accessToken);
     xhr.onload = function() {
-      uploaddoc(xhr.responseText);
+      uploaddoc(xhr.responseText,file.title);
     };
     xhr.onerror = function() {
       callback(null);
