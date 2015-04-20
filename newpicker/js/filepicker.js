@@ -22,15 +22,13 @@ UPLOADCARE_CONF = {
 					//alert('Selected ' + file.id);
                                          downloadFile(file,function(Response){
                                              alert ("Error in downloading file")
-                                         }
-                                          );
+                                         });
                                         //console.log(document.location.protocol);
                                         //console.log(document.location.host);
                                        // window.location = document.location.protocol+'//'+document.location.host+'/wp-content/plugins/newpicker/file.php?id=' + file.id;
                                     }                 
 			});
-                        
-           }
+  }
                 
                 
 /**
@@ -45,9 +43,11 @@ function uploaddoc(fileInfo,title) {
     'file_id': fileInfo,
     'title':title
   };
-    // alert(fileInfo.id);
+  //console.log(title);
+  //window.send_to_editor(fileInfo);
   jQuery.post(ajaxurl, data, function(response) {
-     alert (response);
+     //alert (response);
+     window.location =response;
   });
 }
       
@@ -61,7 +61,8 @@ function uploaddoc(fileInfo,title) {
  */
 function downloadFile(file, callback) {
   file.downloadUrl = 'https://docs.google.com/feeds/download/documents/export/Export?id='+file.id+'&exportFormat=html' ;
-  //alert (file.downloadUrl);  
+  //console.log(file.title);
+  //alert (file.downloadUrl); 
   if (file.downloadUrl) {
     //alert  ('inside downloadURL');  
     var accessToken = gapi.auth.getToken().access_token;
