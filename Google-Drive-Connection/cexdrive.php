@@ -399,9 +399,23 @@ function extract_styles( $head,$contents ) {
 
         preg_match_all( '#.c(?P<digit>\d+){(.*?)font-weight:bold(.*?)}#', $head, $boldmatches );
         preg_match_all('#.c(?P<digit>\d+){(.*?)font-style:italic(.*?)}#', $head, $italicmatches);
-        //xin: find the tag for python code
+        //xin: find the tag for code
         preg_match_all('#.c(?P<digit>\d+){(.*?)background-color:\#ff0000(.*?)}#', $head, $pythonmatches);
         preg_match_all('#.c(?P<digit>\d+){(.*?)background-color:\#ff9900(.*?)}#', $head, $phpmatches);
+
+        //Xin: find margin left settings for list items
+        preg_match_all('#<ul class=(.*?)lst-(.*?)-(?P<digit>\d+)(.*?)>#', $contents, $lists);
+
+        if( !empty( $lists[ 'digit' ] ) ) {
+            $margin=0;
+            foreach( $lists[ 'digit' ] as $listclass ) {
+                $margin=36*(1+$listclass);
+                //$contents = preg_replace('#<ul class=(.*?)lst-(.*?)-' .$listclass. '(.*?)>#s', '<ul style="padding-left: '.$margin.'px";>', $contents );
+            }
+        
+        }
+
+
 
 
         if( !empty( $boldmatches[ 'digit' ] ) ) {
@@ -455,7 +469,7 @@ function clean($post_content) {
         $post_content = preg_replace('/<p(.*?)>/', '<p>', $post_content);
         $post_content = preg_replace('/<li(.*?)>/', '<li>', $post_content);
         //xin: fix the margin of bulleted list
-        $post_content = preg_replace('/<ul(.*?)>/', '<ul style="padding-left: 36px";>', $post_content);
+        //$post_content = preg_replace('/<ul(.*?)>/', '<ul style="padding-left: 36px";>', $post_content);
         //xin: fix the head link bug
         $post_content = preg_replace('/<h1(.*?)>(<a(.*?)>)?/', '<h1>', $post_content);
 
