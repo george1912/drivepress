@@ -21,9 +21,15 @@ function googlepicker_plugin_init() {
     $urltext = sprintf('https://www.google.com/jsapi?key=%s',$apikey,$apikey);        
     $urltextsecond = sprintf('https://apis.google.com/js/client.js?onload=%s',$init,$init);        
     //wp_register_script( 'filepicker', plugins_url( '/filepicker.js', __FILE__ ));   
+<<<<<<< HEAD
     wp_register_script( 'filepicker', plugins_url( 'js/filepicker.js', __FILE__ ),array('jquery'));   
     wp_register_script( 'client', $urltextsecond );   
     wp_register_script( 'pickerscript', plugins_url( 'js/pickerscript.js', __FILE__ ) ); 
+=======
+    wp_register_script( 'filepicker', plugins_url( '/filepicker.js', __FILE__ ),array('jquery'));   
+    wp_register_script( 'client', $urltextsecond );   
+    wp_register_script( 'pickerscript', plugins_url( '/pickerscript.js', __FILE__ ) ); 
+>>>>>>> 2aedde2499b98eb9db7223dcd22be0451edec05e
     wp_register_script( 'jsapi', $urltext ); 
     wp_enqueue_script( 'filepicker' );
     wp_enqueue_script( 'pickerscript' );
@@ -36,7 +42,9 @@ function googlepicker_plugin_init() {
 
 function _googlepicker_get_js_cfg() {
     return array(
+        //'public_key' => get_option('uploadcare_public'),
         'ajaxurl' => admin_url('admin-ajax.php'),
+        //'tabs' => $tabs,
     );
 }
 
@@ -85,7 +93,11 @@ function medialib_upload_form_url($imageUrl)
     $fullpathfilename = $uploads['path'] . "/$filename";
     //Xin new change
     $newUrl=$uploads['url']."/$filename";
+<<<<<<< HEAD
       
+=======
+    //echo "filename:$fullpathfilename<br>";    
+>>>>>>> 2aedde2499b98eb9db7223dcd22be0451edec05e
     
     try {
             
@@ -93,6 +105,10 @@ function medialib_upload_form_url($imageUrl)
     $fileSaved = file_put_contents($uploads['path'] . "/" . $filename, $image_string);
                 
         $attachment = array(
+<<<<<<< HEAD
+=======
+             //'post_mime_type' => $wp_filetype['type'],
+>>>>>>> 2aedde2499b98eb9db7223dcd22be0451edec05e
              //Xin: set type to be image/png
              'post_mime_type' =>'image/png',
              'post_title' => preg_replace('/\.[^.]+$/', '', $filename),
@@ -129,20 +145,44 @@ function get_clean_dom_doc($contents)
     $dom->loadHTML( $contents);
  
     $xpath = new DOMXPath($dom);
+<<<<<<< HEAD
     /* shubha changes to get image links starts here */
+=======
+    /* shubha changes to get links starts here */
+>>>>>>> 2aedde2499b98eb9db7223dcd22be0451edec05e
     $images = $dom->getElementsByTagName('img');
     //echo $images;
     foreach($images as $img)
     {
          $url = $img->getAttribute('src');   
          $alt = $img->getAttribute('alt');
+<<<<<<< HEAD
+=======
+        // $alt = strip_tags($alt);
+        // $url = stripslashes($url);
+        // $url = trim($url,'"');
+        //echo $url;
+>>>>>>> 2aedde2499b98eb9db7223dcd22be0451edec05e
             $finalurl = medialib_upload_form_url($url);
             $img->setAttribute ('src',$finalurl);
             $img->setAttribute ('alt',$alt);
     }
     
+<<<<<<< HEAD
 
     /* shubha changes to get image links ends here */   
+=======
+    $links = $dom->getElementsByTagName('a');
+    foreach ($links as $link)
+    {
+        // $hyperlink = $link->getAttribute('href');
+        // $hyperlink = stripslashes($hyperlink);
+        // $hyperlink = trim($hyperlink,'"');
+        // $link->setAttribute ('href',$hyperlink);
+        //echo $hyperlink;
+    }   
+    /* shubha changes to get links ends here */   
+>>>>>>> 2aedde2499b98eb9db7223dcd22be0451edec05e
     
     
     //Strip the headers and body respectively
@@ -173,6 +213,11 @@ function publish_doc_to_WordPress ( $title, $content ) {
             );
                    
             //If you want all posts to be auto-published, for example, you can add a filter here
+<<<<<<< HEAD
+=======
+            //$post_array = apply_filters( 'wp_insert_post_data ', $post_array );
+            //echo $post_array['post_author'];
+>>>>>>> 2aedde2499b98eb9db7223dcd22be0451edec05e
             $post_array['post_content']=clean_post($post_array['post_content']);
             //Add
             $post_id = wp_insert_post( $post_array );
@@ -275,10 +320,32 @@ function clean_post($post_content) {
  * Get file from google drive
  */
 function google_picker_attach($content,$title) {
+<<<<<<< HEAD
                 //start to convert
                 $clean_doc= get_clean_dom_doc($content);
                 //Converting Document
                 $post_id=publish_doc_to_WordPress($title,$clean_doc);  
+=======
+                //echo "start to convert";
+                //var_dump($content);
+                $clean_doc= get_clean_dom_doc($content);
+                // echo "Converting Document";
+                $post_id=publish_doc_to_WordPress($title,$clean_doc);  
+                //$message = "Converting Document-- Title :{$file->getTitle()}, ID: $fileID} ";
+                //echo $post_id;
+//                if ( $post_id ) {
+//                  $permalink = get_permalink( $post_id );
+//                   wp_redirect( $permalink );
+//                   exit;
+//                  }
+                //wp_redirect( 'http://localhost/wp-admin/post.php?post='.$post_id.'&action=edit', 301 );
+                //echo $clean_doc;
+                //publish_to_WordPress($file->title,$clean_doc);
+
+                return get_post_permalink($post_id);
+    }
+
+>>>>>>> 2aedde2499b98eb9db7223dcd22be0451edec05e
 
                 return get_post_permalink($post_id);
     }
@@ -288,8 +355,16 @@ add_action('wp_ajax_nopriv_google_picker_handle', 'google_picker_handle');
 function google_picker_handle() {
     $file_id = $_POST['file_id'];
     $title=$_POST['title'];
+<<<<<<< HEAD
     $file_id = stripslashes($file_id);
     $link=google_picker_attach($file_id,$title);
+=======
+    //var_dump($file_id);
+    $file_id = stripslashes($file_id);
+    $link=google_picker_attach($file_id,$title);
+    //echo "{\"attach_id\": $attachment_id}"; 
+    //die;
+>>>>>>> 2aedde2499b98eb9db7223dcd22be0451edec05e
     echo $link;    
     exit;
 }
@@ -300,6 +375,7 @@ function add_my_custom_button($context) {
   //path to my icon
   $img = plugins_url( 'media/logo.png' , __FILE__ );
   
+<<<<<<< HEAD
   //append the icon
   $context =<<<HTML
      <button style='padding-right: 2px; vertical-align: text-bottom;' class="action_button" data-behavior="create_google_file_picker">
@@ -316,5 +392,20 @@ function add_inline_popup_content() {
   </div>
 
 <?php
+=======
+  //the id of the container I want to show in the popup
+  //$container_id = 'popup_container';
+  
+  //our popup's title
+  $title = 'Google Drive Popup!';
+
+  //append the icon
+  $context .= "<a class='button' title='{$title}' 
+    id = 'pick' style='padding-right: 2px; vertical-align: text-bottom;'
+    href='javascript:initPicker();'>
+    <img src='{$img}' />Google Drive</a>";
+  
+  return $context;
+>>>>>>> 2aedde2499b98eb9db7223dcd22be0451edec05e
 }
 
