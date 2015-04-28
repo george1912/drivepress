@@ -147,11 +147,9 @@ function get_clean_dom_doc($contents)
          $w=trim($w, " px");
          if($w>=533){
             $img->setAttribute ('class','" aligncenter');
-            //$img->setAttribute('style',$w);
         }
         else{
             $img->setAttribute('class','" alignright');
-            //$img->setAttribute('style',$w);
         }
     }
     
