@@ -136,9 +136,23 @@ function get_clean_dom_doc($contents)
     {
          $url = $img->getAttribute('src');   
          $alt = $img->getAttribute('alt');
-            $finalurl = medialib_upload_form_url($url);
-            $img->setAttribute ('src',$finalurl);
-            $img->setAttribute ('alt',$alt);
+         $finalurl = medialib_upload_form_url($url);
+         $img->setAttribute ('src',$finalurl);
+         $img->setAttribute ('alt',$alt);
+         //get the image width to align the images
+         $style=$img->getAttribute('style');
+         $pieces = explode(";", $style);
+         $width = explode(":",$pieces[0]);
+         $w=$width[1];
+         $w=trim($w, " px");
+         if($w>=533){
+            $img->setAttribute ('class','" aligncenter');
+            //$img->setAttribute('style',$w);
+        }
+        else{
+            $img->setAttribute('class','" alignright');
+            //$img->setAttribute('style',$w);
+        }
     }
     
 
