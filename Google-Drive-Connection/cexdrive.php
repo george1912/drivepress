@@ -296,23 +296,6 @@ function cexdrive_del_config(){
 	//$wpdb->delete( $table_name, array( 'id' => 1 ), array( '%d' ) );
 }
 
-function loadNprepare($content,$encod='') {
-        if (!empty($content)) {
-                if (empty($encod))
-                        $encod  = mb_detect_encoding($content);
-                        $headpos = mb_strpos($content,'<head>');
-                if (FALSE=== $headpos)
-                        $headpos= mb_strpos($content,'<HEAD>');
-                if (FALSE!== $headpos) {
-                        $headpos+=6;
-                        $content = mb_substr($content,0,$headpos) . '<meta http-equiv="Content-Type" content="text/html; charset='.$encod.'">' .mb_substr($content,$headpos);
-                }
-                $content=mb_convert_encoding($content, 'HTML-ENTITIES', $encod);
-
-        }
-        return $content;
-    }
-
 /**
  * parse the raw html content of google doc.
  * 
@@ -321,7 +304,6 @@ function loadNprepare($content,$encod='') {
  */
 function get_clean_doc($contents) 
 {
-    $contents=loadNprepare($contents);
     //Xin: the css in top of raw html file is not well formatted, so we need to first parse the head info
     //and extract the style info, modify the html with right style before further parsing
     //New domDocument and xPath to get the content
@@ -415,21 +397,9 @@ function extract_styles( $head,$contents ) {
 
         preg_match_all( '#.c(?P<digit>\d+){(.*?)font-weight:bold(.*?)}#', $head, $boldmatches );
         preg_match_all('#.c(?P<digit>\d+){(.*?)font-style:italic(.*?)}#', $head, $italicmatches);
-        //xin: find the tag for python code
-        preg_match_all('#.c(?P<digit>\d+){(.*?)background-color:\#ff0000(.*?)}#', $head, $pythonmatches);
-        preg_match_all('#.c(?P<digit>\d+){(.*?)background-color:\#ff9900(.*?)}#', $head, $phpmatches);
 
         //Xin: find margin left settings for list items
         preg_match_all('#<ul class=(.*?)lst-(.*?)-(?P<digit>\d+)(.*?)>#', $contents, $lists);
-
-        if( !empty( $lists[ 'digit' ] ) ) {
-            $margin=0;
-            foreach( $lists[ 'digit' ] as $listclass ) {
-                //$margin=36*(1+$listclass);
-                //$contents = preg_replace('#<ul class=(.*?)lst-(.*?)-'.$listclass.'([^>]*?)>#s', '<ul style="padding-left: '.$margin.'px";>', $contents );
-            }
-        
-        }
 
 
         if( !empty( $boldmatches[ 'digit' ] ) ) {
@@ -446,29 +416,10 @@ function extract_styles( $head,$contents ) {
         
             foreach( $italicmatches[ 'digit' ] as $italicclass ) {
                 $contents = preg_replace( '#<span class="(.*?)c' . $italicclass . '(.*?)">(.*?)</span>#s', '<span class="$1c' . $italicclass . '$2"><em>$3</em></span>', $contents );
+
             }
         
-        }
-
-        //xin: modify the raw html in order to distinguish python code from text, wrap in tag <code class="python">
-        if( !empty( $pythonmatches[ 'digit' ] ) ) {
-        
-            foreach( $pythonmatches[ 'digit' ] as $pythonclass ) {
-                $contents =preg_replace( '#<span class="c'.$pythonclass.'">(.*?)</span>#s', '<code class="python">'.'$1'.'</code>', $contents );
-            }
-        
-        }
-
-        //xin: modify the raw html in order to distinguish php code from text, wrap in tag <code class="php">
-        if( !empty( $phpmatches[ 'digit' ] ) ) {
-        
-            foreach( $phpmatches[ 'digit' ] as $phpclass ) {
-                $contents =preg_replace( '#<span class="c'.$phpclass.'">(.*?)</span>#s', '<code class="php">'.'$1'.'</code>', $contents );
-            }
-        
-        }
-
-        
+        }     
         return $contents;
 
 }
@@ -483,7 +434,7 @@ function clean($post_content) {
         $post_content = preg_replace('/<p(.*?)>/', '<p>', $post_content);
         $post_content = preg_replace('/<li(.*?)>/', '<li>', $post_content);
         //xin: fix the margin of bulleted list
-        //$post_content = preg_replace('/<ul(.*?)>/', '<ul style="padding-left: 36px";>', $post_content);
+        
         $post_content = preg_replace('#<ul class=(.*?)lst-([^-]*?)-0([^>]*?)>#', '<ul style="padding-left: 36px";>', $post_content );
         $post_content = preg_replace('#<ul class=(.*?)lst-([^-]*?)-1([^>]*?)>#', '<ul style="padding-left: 72px";>', $post_content );
         $post_content = preg_replace('#<ul class=(.*?)lst-([^-]*?)-2([^>]*?)>#', '<ul style="padding-left: 108px";>', $post_content );

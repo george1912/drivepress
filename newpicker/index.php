@@ -9,23 +9,32 @@
 
 //add a button to the content editor, next to the media button
 add_action('media_buttons_context', 'add_my_custom_button');
+//add_action('media_buttons_context', 'add_button');
+//add some content to the bottom of the page 
+//This will be shown in the inline modal
+add_action('admin_footer', 'add_inline_popup_content');
+
 // Enqueue the javascripts for google picker
 add_action('init', 'googlepicker_plugin_init');
 
 function googlepicker_plugin_init() {
     $apikey = 'AIzaSyD2MXMpx_c6H38-wk3z097UbVPgg-FakaU';
-    $init = 'initPicker';
-    $urltext = sprintf('https://www.google.com/jsapi?key=%s',$apikey,$apikey);        
+    $init = 'googleClientLoaded';
+    $urltext = sprintf('https://www.google.com/jsapi?key=%s',$apikey,$apikey);    
     $urltextsecond = sprintf('https://apis.google.com/js/client.js?onload=%s',$init,$init);        
     //wp_register_script( 'filepicker', plugins_url( '/filepicker.js', __FILE__ ));   
-    wp_register_script( 'filepicker', plugins_url( '/filepicker.js', __FILE__ ),array('jquery'));   
-    wp_register_script( 'client', $urltextsecond );   
-    wp_register_script( 'pickerscript', plugins_url( '/pickerscript.js', __FILE__ ) ); 
+    wp_register_script( 'filepicker', plugins_url( 'js/filepicker.js', __FILE__ ),array('jquery'));   
+    
+    wp_register_script( 'client', $urltextsecond );  
+    wp_register_script( 'pickerscript', plugins_url( 'js/pickerscript.js', __FILE__ ) ); 
+ 
     wp_register_script( 'jsapi', $urltext ); 
     wp_enqueue_script( 'filepicker' );
     wp_enqueue_script( 'pickerscript' );
     wp_enqueue_script( 'client' );
     wp_enqueue_script( 'jsapi' );
+    wp_enqueue_script( 'jquery' );
+
     
      wp_localize_script('filepicker', 'WP_GP_PARAMS', _googlepicker_get_js_cfg());
 }
@@ -258,10 +267,12 @@ function clean_post($post_content) {
         //adding <img> to keep the images info
         $post_content = strip_tags($post_content, '<strong><b><i><em><a><u><br><p><ol><ul><li><h1><h2><h3><h4><h5><h6><img><code><pre>' );
         $post_content = str_replace( '--','&mdash;',$post_content );
-        $post_content = str_replace( '<br><br>','<p>',$post_content );
+        $post_content = str_replace( '<br><br>',"\n",$post_content );
         $post_content = str_replace( '<br>&nbsp;&nbsp;&nbsp;', '\n\n', $post_content );
         $post_content = str_replace( '<br>&nbsp;&nbsp;&nbsp;','\n\n',$post_content);
-        $post_content = str_replace( '<br><br>', '\n\n', $post_content );
+        $post_content = str_replace( '<br><br>', "\n\n", $post_content );
+        $post_content = str_replace( '<br>', "\n", $post_content );
+
         $post_content = trim( $post_content );
         $pees = explode( '<p>', $post_content );
         $trimmed = array();
@@ -333,15 +344,20 @@ function add_my_custom_button($context) {
   
   //the id of the container I want to show in the popup
   //$container_id = 'popup_container';
-  
-  //our popup's title
-  $title = 'Google Drive Popup!';
-
-  //append the icon
-  $context .= "<a class='button' title='{$title}' 
-    id = 'pick' style='padding-right: 2px; vertical-align: text-bottom;'
-    href='javascript:initPicker();'>
-    <img src='{$img}' />Google Drive</a>";
-  
+//append the icon
+  $context =<<<HTML
+     <button style='padding-right: 2px; vertical-align: text-bottom;' class="action_button" data-behavior="create_google_file_picker">
+         <img src='{$img}'/>Google Drive</button> 
+HTML;
   return $context;
+}
+
+function add_inline_popup_content() {
+?>
+  <div data-behavior="picker_account_switcher" class="picker_account_switcher">
+    <strong>You&rsquo;re signed in to Google as <span data-role="picker_account_email"></span></strong>
+    <a data-behavior="google_account_switcher" href="#">Sign out and use a different Google account</a>
+  </div>
+
+<?php
 }
