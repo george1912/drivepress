@@ -1,0 +1,125 @@
+body {
+  position: relative;
+  font: 14px Ariel, sans-serif;
+  background-color: #b0c4de;
+}
+
+img {
+  border: none;
+}
+
+ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+h2 {
+    font-size: 26px;
+}
+
+h3 {
+    font-size: 18px;
+}
+
+h4 {
+    font-size: 16px;
+}
+
+blockquote {
+  font-style: italic;
+  font-size: 28px;
+  margin-bottom: 20px;
+}
+
+footer {
+  border-top: 1px solid #000;
+  padding-top: 10px;
+}
+
+label {
+  font-weight: bold;
+  margin-right: 15px;
+}
+
+input[type=date] {
+  width: 70px;
+}
+
+input[type=submit] {
+  width: 200px;
+}
+
+/*center*/
+th {
+  text-align: center;
+  width: 100px;
+  padding: 5px 20px 5px 0;
+}
+/*center*/
+td {
+  text-align: center;
+  vertical-align: top;
+  padding: 5px;
+}
+
+#container {
+  overflow: hidden;
+  width: 800px;
+  margin: 0 auto;
+}
+
+#main { 
+  overflow: hidden;
+  padding: 1rem 1rem 6rem 1rem;
+}
+
+.app-information {
+  margin-bottom: 30px;
+}
+
+#main h2 {
+    margin: 0 0 1rem;
+}
+
+#main img {
+    max-width: 100%;
+}
+
+#error {
+  color: #f00;
+}
+
+#results {
+  overflow: hidden;
+  width: 100%;
+}
+
+/*change float to center from left*/
+#results section {
+  float: top;
+  width: 340px;
+  border-top: 1px solid #000;
+  margin: 20px 0;
+  padding: 20px 0;
+}
+
+#results section:nth-child(odd) {
+  clear: both;
+  margin-right: 80px;
+}
+
+#top-answerers li,
+#unanswered li,
+#top-askers li,
+#faq li,
+#related-tags li {
+  margin-bottom: 5px;
+}
+
+#top-answerers img,
+#top-askers img {
+  width: 32px;
+  margin-right: 5px;
+  vertical-align: middle;
+}
