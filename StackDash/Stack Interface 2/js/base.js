@@ -252,8 +252,8 @@ var test = {"items":[{"tags":["sms","twilio"],"owner":{"reputation":49,"user_id"
 
             //Get the loading status of the current document
             if (xhr.readyState === 4) {
-                //console.log("Type: " + type);
-                //console.log(xhr.response);
+                console.log("Type: " + type);
+                console.log(xhr.response);
                 var response = xhr.response,
                     quotaRemaining = response.quota_remaining;
 
