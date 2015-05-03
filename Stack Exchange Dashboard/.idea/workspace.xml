@@ -34,8 +34,8 @@
       <file leaf-file-name="question.json" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/question.json">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-13.529411">
-              <caret line="46" column="33" selection-start-line="46" selection-start-column="23" selection-end-line="46" selection-end-column="33" />
+            <state vertical-scroll-proportion="-12.058824">
+              <caret line="41" column="27" selection-start-line="41" selection-start-column="27" selection-end-line="41" selection-end-column="27" />
               <folding />
             </state>
           </provider>
@@ -44,8 +44,61 @@
       <file leaf-file-name="chat.html" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/chat.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.49748743">
-              <caret line="33" column="30" selection-start-line="33" selection-start-column="30" selection-end-line="33" selection-end-column="30" />
+            <state vertical-scroll-proportion="0.35640496">
+              <caret line="24" column="35" selection-start-line="24" selection-start-column="35" selection-end-line="24" selection-end-column="35" />
+              <folding>
+                <element signature="n#style#0;n#div#0;n#body#0;n#html#0;n#!!top" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="chart2.html" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/chart2.html">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="-45.0">
+              <caret line="72" column="44" selection-start-line="72" selection-start-column="44" selection-end-line="72" selection-end-column="44" />
+              <folding>
+                <marker date="1430621326000" expanded="true" signature="541:596" placeholder="//..." />
+                <marker date="1430621326000" expanded="true" signature="722:1648" placeholder="{...}" />
+                <marker date="1430621326000" expanded="true" signature="1045:1648" placeholder="{...}" />
+                <marker date="1430621326000" expanded="true" signature="1155:1648" placeholder="{...}" />
+                <marker date="1430621326000" expanded="true" signature="1177:1257" placeholder="//..." />
+                <marker date="1430621326000" expanded="true" signature="1427:1531" placeholder="{...}" />
+                <marker date="1430621326000" expanded="true" signature="1557:1648" placeholder="{...}" />
+                <marker date="1430621326000" expanded="true" signature="1670:2159" placeholder="{...}" />
+                <marker date="1430621326000" expanded="true" signature="1769:2084" placeholder="{...}" />
+                <marker date="1430621326000" expanded="true" signature="1968:2054" placeholder="{...}" />
+                <marker date="1430621326000" expanded="true" signature="3372:3495" placeholder="{...}" />
+                <marker date="1430621326000" expanded="true" signature="3753:4243" placeholder="{...}" />
+                <marker date="1430621326000" expanded="true" signature="4091:4161" placeholder="//..." />
+                <marker date="1430621326000" expanded="true" signature="4291:4573" placeholder="{...}" />
+                <marker date="1430621326000" expanded="true" signature="4406:4562" placeholder="{...}" />
+                <marker date="1430621326000" expanded="true" signature="4583:4638" placeholder="//..." />
+                <marker date="1430621326000" expanded="true" signature="4684:5368" placeholder="{...}" />
+                <marker date="1430621326000" expanded="true" signature="4791:5130" placeholder="//..." />
+                <marker date="1430621326000" expanded="true" signature="5380:5682" placeholder="/*...*/" />
+                <marker date="1430621326000" expanded="true" signature="5692:6327" placeholder="/*...*/" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="index.html" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../../surculus/George_JS/index.html">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="-6.875">
+              <caret line="11" column="53" selection-start-line="11" selection-start-column="8" selection-end-line="11" selection-end-column="53" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="stack (1).js" pinned="false" current-in-tab="false">
+        <entry file="file://$USER_HOME$/Downloads/stack (1).js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0">
+              <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="96" selection-end-column="5" />
               <folding />
             </state>
           </provider>
@@ -68,7 +121,9 @@
       <list>
         <option value="$PROJECT_DIR$/question.json" />
         <option value="$PROJECT_DIR$/twilio-4-5.json" />
+        <option value="$USER_HOME$/Downloads/stack (1).js" />
         <option value="$PROJECT_DIR$/chat.html" />
+        <option value="$PROJECT_DIR$/chart2.html" />
       </list>
     </option>
   </component>
@@ -81,7 +136,7 @@
   </component>
   <component name="ProjectFrameBounds">
     <option name="y" value="23" />
-    <option name="width" value="1920" />
+    <option name="width" value="1492" />
     <option name="height" value="1116" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="false">
@@ -181,14 +236,14 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="23" width="1920" height="1116" extended-state="6" />
+    <frame x="0" y="23" width="1492" height="1116" extended-state="6" />
     <editor active="true" />
     <layout>
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.25" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32171583" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="true" content_ui="tabs" />
@@ -207,7 +262,9 @@
     <option name="myLimit" value="2678400000" />
   </component>
   <component name="XDebuggerManager">
-    <breakpoint-manager />
+    <breakpoint-manager>
+      <option name="time" value="2" />
+    </breakpoint-manager>
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
@@ -215,14 +272,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="-24.583334">
           <caret line="720" column="33" selection-start-line="720" selection-start-column="23" selection-end-line="720" selection-end-column="33" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/question.json">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-13.529411">
-          <caret line="46" column="33" selection-start-line="46" selection-start-column="23" selection-end-line="46" selection-end-column="33" />
           <folding />
         </state>
       </provider>
@@ -243,11 +292,66 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/question.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-12.058824">
+          <caret line="41" column="27" selection-start-line="41" selection-start-column="27" selection-end-line="41" selection-end-column="27" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/Downloads/stack (1).js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="96" selection-end-column="5" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../surculus/George_JS/index.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-6.875">
+          <caret line="11" column="53" selection-start-line="11" selection-start-column="8" selection-end-line="11" selection-end-column="53" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/chart2.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-45.0">
+          <caret line="72" column="44" selection-start-line="72" selection-start-column="44" selection-end-line="72" selection-end-column="44" />
+          <folding>
+            <marker date="1430621326000" expanded="true" signature="541:596" placeholder="//..." />
+            <marker date="1430621326000" expanded="true" signature="722:1648" placeholder="{...}" />
+            <marker date="1430621326000" expanded="true" signature="1045:1648" placeholder="{...}" />
+            <marker date="1430621326000" expanded="true" signature="1155:1648" placeholder="{...}" />
+            <marker date="1430621326000" expanded="true" signature="1177:1257" placeholder="//..." />
+            <marker date="1430621326000" expanded="true" signature="1427:1531" placeholder="{...}" />
+            <marker date="1430621326000" expanded="true" signature="1557:1648" placeholder="{...}" />
+            <marker date="1430621326000" expanded="true" signature="1670:2159" placeholder="{...}" />
+            <marker date="1430621326000" expanded="true" signature="1769:2084" placeholder="{...}" />
+            <marker date="1430621326000" expanded="true" signature="1968:2054" placeholder="{...}" />
+            <marker date="1430621326000" expanded="true" signature="3372:3495" placeholder="{...}" />
+            <marker date="1430621326000" expanded="true" signature="3753:4243" placeholder="{...}" />
+            <marker date="1430621326000" expanded="true" signature="4091:4161" placeholder="//..." />
+            <marker date="1430621326000" expanded="true" signature="4291:4573" placeholder="{...}" />
+            <marker date="1430621326000" expanded="true" signature="4406:4562" placeholder="{...}" />
+            <marker date="1430621326000" expanded="true" signature="4583:4638" placeholder="//..." />
+            <marker date="1430621326000" expanded="true" signature="4684:5368" placeholder="{...}" />
+            <marker date="1430621326000" expanded="true" signature="4791:5130" placeholder="//..." />
+            <marker date="1430621326000" expanded="true" signature="5380:5682" placeholder="/*...*/" />
+            <marker date="1430621326000" expanded="true" signature="5692:6327" placeholder="/*...*/" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/chat.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.49748743">
-          <caret line="33" column="30" selection-start-line="33" selection-start-column="30" selection-end-line="33" selection-end-column="30" />
-          <folding />
+        <state vertical-scroll-proportion="0.35640496">
+          <caret line="24" column="35" selection-start-line="24" selection-start-column="35" selection-end-line="24" selection-end-column="35" />
+          <folding>
+            <element signature="n#style#0;n#div#0;n#body#0;n#html#0;n#!!top" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
