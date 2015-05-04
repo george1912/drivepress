@@ -10,13 +10,13 @@
         endDate = document.querySelector("#end-date"),
         timePeriod = document.querySelector("#time-period"),
 
-        //returns full year
+    //returns full year
         year = new Date().getFullYear(),
-        //returns month from 0-11 add one for 12 months
+    //returns month from 0-11 add one for 12 months
         month = new Date().getMonth() + 1,
 
 
-        //var for number of days in month
+    //var for number of days in month
         daysinMonth = 31,
 
     //array objects anything after : is a member
@@ -97,14 +97,14 @@
     function addResults (type) {
         var questionsWithActivity = questions.withActivity.total,
             unansweredQuestions = questions.unanswered.total,
-            //if greater than 10 get %
+        //if greater than 10 get %
             percentageUnanswered = (questionsWithActivity > 0)? parseFloat((unansweredQuestions/questionsWithActivity) * 100).toFixed(2) : "100";
 
         // Popular tags, for filling the <datalist> element
         if (type === "popularTags") {
             var popularTagsList = document.querySelector("#popular-tags"),
                 popularTags = questions.popularTags.items,
-                //store in popular tags var starting as blank
+            //store in popular tags var starting as blank
                 popularTagsResults = "";
 
             //this is just for presetting popular tags
@@ -279,10 +279,129 @@
 
     //getting as a json object
     //plugging in values
-    function getQuestionsWithActivity () {
+
+    /*function getQuestionsWithActivity () {
         // All questions for a certain time period - http://api.stackexchange.com/docs/search
         getItems("withActivity", "http://api.stackexchange.com/2.2/search?fromdate=" + questions.startDate + "&todate=" + questions.	endDate + "&order=desc&sort=activity&tagged=" + questions.tag + "&site=stackoverflow&filter=!9WA((MBIa");
+    }*/
+
+
+
+
+
+
+
+
+
+
+    google.setOnLoadCallback(getQuestionsWithActivity);
+    function getItems(type, url) {
+        var data = new google.visualization.DataTable();
+        data.addColumn('string', 'Day');
+        data.addColumn('number', 'count');
+
+        //The XMLHttpRequest object is used to exchange data with a server behind the scenes
+        var xhr = new XMLHttpRequest();
+
+        //Stores a function (or the name of a function) to be called automatically each time the readyState property changes
+        xhr.onreadystatechange = function () {
+
+            //Get the loading status of the current document
+            if (xhr.readyState === 4) {
+                //console.log("Type: " + type);
+                //console.log(xhr.response);
+                var response = xhr.response,
+                    quotaRemaining = response.quota_remaining;
+
+                if (response.error_message) {
+                    showErrors(response.error_name, response.error_message);
+                }
+                else {
+                    var items=response.items;
+                    for (var i=0; i<tempTime.length; i++){
+                        var count=0;
+                        items.forEach(function(item){
+                            var jsonTime=getDateTime(item.creation_date*1000);
+                            //console.log(jsonTime);
+                            if(tempTime[i]==jsonTime){
+                                count=count+1;
+                            }
+                        });
+                        tempData[i]=count;
+                        data.addRow([tempTime[i],tempData[i]]) ;
+                    }
+                    //console.log(tempTime);
+                    console.log("first");
+                    finalData=[].concat(tempData);
+                    //console.log(tempData);
+                    finalTime=[].concat(tempTime);
+                    console.log("last");
+                    var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+                    chart.draw(data, {displayAnnotations: true});
+                }
+
+                // Remining requests today from your IP
+                if (quotaRemaining) {
+                    //document.querySelector("#remaining-requests").innerHTML = quotaRemaining;
+                }
+            }
+        };
+
+        //same as xmlhttp.open("GET","ajax_info.txt",true);
+        xhr.open("GET", url, true);
+        xhr.responseType = "json";
+        xhr.send(null);
+
     }
+
+
+    //new activity
+    function getQuestionsWithActivity () {
+        console.log("start");
+        //generateTimeSerial("1429056000","1430524800");
+
+        generateTimeSerial(startDate,endDate)
+
+        // All questions for a certain time period - http://api.stackexchange.com/docs/search
+        //response=getItems("withActivity", "http://api.stackexchange.com/2.2/search?fromdate=" + questions.startDate + "&todate=" + questions.	endDate + "&order=desc&sort=activity&tagged=" + questions.tag + "&site=stackoverflow&filter=!9WA((MBIa");
+        getItems("withActivity", "http://api.stackexchange.com/2.2/search?fromdate="+questions.startDate + "&todate="+questions.	endDate  + "&order=asc&sort=creation&tagged="+questions.tag + "&sort=creation"+"&site=stackoverflow&filter=!9WA((MBIa");
+    }
+    //new activity
+
+
+
+
+    //adding get time
+
+    function getDateTime(timestamp){
+        var a=new Date(timestamp);
+        var months = ['01','02','03','04','05','06','07','08','09','10','11','12'];
+        var year = a.getFullYear();
+        var month = ('0' + (a.getMonth() + 1)).slice(-2);  // Months are zero based. Add leading 0.
+        var day = ('0' + a.getDate()).slice(-2);
+        //var month = months[a.getMonth()];
+        //var day=a.getDate();
+        var time=year+"-"+month+"-"+day;
+
+        return time;
+
+    }
+    //gettimestamp
+
+    //gettimeserial
+    function generateTimeSerial(start,end){
+
+
+        var date=new Date(start*1000);
+        var end=new Date(end*1000);
+        while(date<=end){
+            tempTime.push(getDateTime(date));
+            tempData.push(0);
+            date.setTime(date.getTime() + 86400000);
+        }
+
+    }
+    //get time serial
 
     function getUnansweredQuestions () {
         // All questions without an answer for a certain time period - http://api.stackexchange.com/docs/unanswered-questions
