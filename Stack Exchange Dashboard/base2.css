@@ -53,19 +53,19 @@ input[type=submit] {
 /*center*/
 th {
     text-align: center;
-    width: 100px;
-    padding: 5px 20px 5px 0;
+    width: 0px;
+    padding: 0px 0px 0px 0;
 }
 /*center*/
 td {
     text-align: center;
     vertical-align: top;
-    padding: 5px;
+    padding: 0px;
 }
 
 #container {
     overflow: hidden;
-    width: 800px;
+    width: 0px;
     margin: 0 auto;
 }
 
@@ -75,7 +75,7 @@ td {
 }
 
 .app-information {
-    margin-bottom: 30px;
+    margin-bottom: 0px;
 }
 
 #main h2 {
@@ -98,15 +98,15 @@ td {
 /*change float to center from left*/
 #results section {
     float: top;
-    width: 340px;
+    width: 0px;
     border-top: 1px solid #000;
-    margin: 20px 0;
-    padding: 20px 0;
+    margin: 0px 0;
+    padding: 0px 0;
 }
 
 #results section:nth-child(odd) {
     clear: both;
-    margin-right: 80px;
+    margin-right: 0px;
 }
 
 #top-answerers li,
@@ -114,12 +114,12 @@ td {
 #top-askers li,
 #faq li,
 #related-tags li {
-    margin-bottom: 5px;
+    margin-bottom: 0px;
 }
 
 #top-answerers img,
 #top-askers img {
-    width: 32px;
-    margin-right: 5px;
+    width: 0px;
+    margin-right: 0px;
     vertical-align: middle;
 }

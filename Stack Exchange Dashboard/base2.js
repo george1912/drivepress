@@ -1,7 +1,11 @@
 "use strict";
 
+(function () {
 
-(function() {
+    var finalTime;
+    var finalData;
+    var tempTime=['x'];
+    var tempData=['data1'];
     //this function is creating a set of variables that relate to  what things are being parsed though
     //tag, start/enddate and the period time between them the # is just an anchor
 
@@ -23,40 +27,38 @@
 
         questions = {
             //this will connect to the variables we have
-            tag : "firefox-os",
-            startDate : "2014-04-01",
-            endDate : "2014-04-31",
-            timePeriod : "month",
+            //tag: "firefox-os",
+            //startDate: "2014-04-01",
+            //endDate: "2014-04-31",
+            //timePeriod: "month",
 
             //members within members
             //questions with activity
             //unanswered questions
             //top askers
             //related tags
-            withActivity : {
-                total : 0
+            withActivity: {
+                total: 0
             },
-            unanswered :  {
-                total : 0
+            unanswered: {
+                total: 0
             },
-            topAskers : {
-                items  : []
+            topAskers: {
+                items: []
             },
-            faq : {
-                items  : []
+            faq: {
+                items: []
             },
-            relatedTags : {
-                items  : []
+            relatedTags: {
+                items: []
             }
         };
-
-
 
 
     // Setting up the form
 
     //switch statement for month
-    switch (month){
+    switch (month) {
         //feb the second month
 
         case 2:
@@ -79,7 +81,7 @@
     //so if month is 9 or below append 0 to month else its month so its 9, then 09
     // you dont do that for 10
 
-    month = (month < 10)? "0" + month : month;
+    month = (month < 10) ? "0" + month : month;
 
     // for year document.getElementById(id)  start date get value then year then append - and add the day as 01
     startDate.value = year + "-" + month + "-01";
@@ -94,11 +96,11 @@
 
 //getting the results
     //getting questions with activity calling total activity
-    function addResults (type) {
+    function addResults(type) {
         var questionsWithActivity = questions.withActivity.total,
             unansweredQuestions = questions.unanswered.total,
         //if greater than 10 get %
-            percentageUnanswered = (questionsWithActivity > 0)? parseFloat((unansweredQuestions/questionsWithActivity) * 100).toFixed(2) : "100";
+            percentageUnanswered = (questionsWithActivity > 0) ? parseFloat((unansweredQuestions / questionsWithActivity) * 100).toFixed(2) : "100";
 
         // Popular tags, for filling the <datalist> element
         if (type === "popularTags") {
@@ -108,7 +110,7 @@
                 popularTagsResults = "";
 
             //this is just for presetting popular tags
-            for (var i=0,l=popularTags.length, tag; i<l; i++) {
+            for (var i = 0, l = popularTags.length, tag; i < l; i++) {
                 tag = popularTags[i];
                 popularTagsResults += "<option value=\"" + tag.name + "\">";
             }
@@ -137,11 +139,11 @@
             var unanswered = document.querySelector("#unanswered"),
                 allUnanswered = questions.unanswered.items;
             if (allUnanswered) {
-                var totalUnanswereds = (allUnanswered.length > 10)? 10 : allUnanswered.length,
+                var totalUnanswereds = (allUnanswered.length > 10) ? 10 : allUnanswered.length,
                     unansweredResults = "<ul>";
 
                 //plug it into the HTML
-                for (var j=0,jl=totalUnanswereds, question; j<jl; j++) {
+                for (var j = 0, jl = totalUnanswereds, question; j < jl; j++) {
                     question = allUnanswered[j];
                     unansweredResults += "<li>" +
                     "<a href=\"" + question.link + "\">" +
@@ -158,16 +160,16 @@
             var topAnswerers = document.querySelector("#top-answerers"),
                 allTopAnswerers = questions.topAnswerers.items;
             if (allTopAnswerers) {
-                var totalTopAnswerers = (allTopAnswerers.length > 5)? 5 : allTopAnswerers.length,
+                var totalTopAnswerers = (allTopAnswerers.length > 5) ? 5 : allTopAnswerers.length,
                     topAnswerersResults = "<ul>";
 
-                for (var k=0,kl=totalTopAnswerers, answerer; k<kl; k++) {
+                for (var k = 0, kl = totalTopAnswerers, answerer; k < kl; k++) {
                     answerer = allTopAnswerers[k];
                     topAnswerersResults += "<li>" +
                     "<a href=\"" + answerer.user.link + "\">" +
                     "<img src=\"" + answerer.user.profile_image + "\" alt=\"\">" +
                     answerer.user.display_name + "</a>" + ", Score: " + answerer.score + " (" +
-                    answerer.post_count + " question" + ((answerer.post_count > 1)? "s" : "") + ")</li>";
+                    answerer.post_count + " question" + ((answerer.post_count > 1) ? "s" : "") + ")</li>";
                 }
                 topAnswerersResults += "</ul>";
                 topAnswerers.innerHTML = topAnswerersResults;
@@ -179,15 +181,15 @@
             var topAskers = document.querySelector("#top-askers"),
                 allTopAskers = questions.topAskers.items;
             if (allTopAskers) {
-                var totalTopAskers = (allTopAskers.length > 5)? 5 : allTopAskers.length,
+                var totalTopAskers = (allTopAskers.length > 5) ? 5 : allTopAskers.length,
                     topAskersResults = "<ul>";
 
-                for (var m=0,ml=totalTopAskers, asker; m<ml; m++) {
+                for (var m = 0, ml = totalTopAskers, asker; m < ml; m++) {
                     asker = allTopAskers[m];
                     topAskersResults += "<li>" +
                     "<a href=\"" + asker.user.link + "\">" +
                     "<img src=\"" + asker.user.profile_image + "\" alt=\"\">" +
-                    asker.user.display_name + "</a>" + ", " + asker.post_count + " question" + ((asker.post_count > 1)? "s" : "") + "</li>";
+                    asker.user.display_name + "</a>" + ", " + asker.post_count + " question" + ((asker.post_count > 1) ? "s" : "") + "</li>";
                 }
                 topAskersResults += "</ul>";
                 topAskers.innerHTML = topAskersResults;
@@ -199,10 +201,10 @@
             var faq = document.querySelector("#faq"),
                 allFaq = questions.faq.items;
             if (allFaq) {
-                var totalFaqs = (allFaq.length > 10)? 10 : allFaq.length,
+                var totalFaqs = (allFaq.length > 10) ? 10 : allFaq.length,
                     faqResults = "<ul>";
 
-                for (var n=0,nl=totalFaqs, faqQuestion; n<nl; n++) {
+                for (var n = 0, nl = totalFaqs, faqQuestion; n < nl; n++) {
                     faqQuestion = allFaq[n];
                     faqResults += "<li>" +
                     "<a href=\"" + faqQuestion.link + "\">" +
@@ -219,10 +221,10 @@
             var relatedTags = document.querySelector("#related-tags"),
                 allRelatedTags = questions.relatedTags.items;
             if (allRelatedTags) {
-                var totalRelatedTags = (allRelatedTags.length > 10)? 10 : allRelatedTags.length,
+                var totalRelatedTags = (allRelatedTags.length > 10) ? 10 : allRelatedTags.length,
                     relatedTagsResults = "<ul>";
 
-                for (var o=0,ol=totalRelatedTags, relatedTag; o<ol; o++) {
+                for (var o = 0, ol = totalRelatedTags, relatedTag; o < ol; o++) {
                     relatedTag = allRelatedTags[o];
                     relatedTagsResults += "<li>" +
                     "<a href=\"http://stackoverflow.com/questions/tagged/" + relatedTag.name + "\">" +
@@ -235,7 +237,7 @@
     }
 
     //showing call errors shown on HTML anchor
-    function showErrors (name, msg) {
+    function showErrors(name, msg) {
         var error = document.querySelector("#error");
         error.innerHTML = name + "<br>" + msg;
     }
@@ -252,7 +254,7 @@
             //Get the loading status of the current document
             if (xhr.readyState === 4) {
                 console.log("Type: " + type);
-                console.log(xhr.response);
+                //console.log(xhr.response);
                 var response = xhr.response,
                     quotaRemaining = response.quota_remaining;
 
@@ -280,25 +282,9 @@
     //getting as a json object
     //plugging in values
 
-    /*function getQuestionsWithActivity () {
-        // All questions for a certain time period - http://api.stackexchange.com/docs/search
-        getItems("withActivity", "http://api.stackexchange.com/2.2/search?fromdate=" + questions.startDate + "&todate=" + questions.	endDate + "&order=desc&sort=activity&tagged=" + questions.tag + "&site=stackoverflow&filter=!9WA((MBIa");
-    }*/
 
+    function getQuestionItems(type, url) {
 
-
-
-
-
-
-
-
-
-    google.setOnLoadCallback(getQuestionsWithActivity);
-    function getItems(type, url) {
-        var data = new google.visualization.DataTable();
-        data.addColumn('string', 'Day');
-        data.addColumn('number', 'count');
 
         //The XMLHttpRequest object is used to exchange data with a server behind the scenes
         var xhr = new XMLHttpRequest();
@@ -317,27 +303,55 @@
                     showErrors(response.error_name, response.error_message);
                 }
                 else {
-                    var items=response.items;
-                    for (var i=0; i<tempTime.length; i++){
-                        var count=0;
-                        items.forEach(function(item){
-                            var jsonTime=getDateTime(item.creation_date*1000);
+                    var items = response.items;
+                    console.log(items);
+                    for (var i = 1; i < tempTime.length; i++) {
+                        var count = 0;
+                        items.forEach(function (item) {
+                            var jsonTime = getDateTime(item.creation_date * 1000);
                             //console.log(jsonTime);
-                            if(tempTime[i]==jsonTime){
-                                count=count+1;
+                            if (tempTime[i] == jsonTime) {
+                                count = count + 1;
                             }
                         });
-                        tempData[i]=count;
-                        data.addRow([tempTime[i],tempData[i]]) ;
+                        tempData[i] = count;
+
                     }
+
                     //console.log(tempTime);
                     console.log("first");
-                    finalData=[].concat(tempData);
+                    finalData = [].concat(tempData);
                     //console.log(tempData);
-                    finalTime=[].concat(tempTime);
+                    finalTime = [].concat(tempTime);
                     console.log("last");
-                    var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
-                    chart.draw(data, {displayAnnotations: true});
+                    console.log(finalData);
+                    console.log(finalTime);
+
+                    //chart added here
+                    var chart = c3.generate({
+                        data: {
+                            x: 'x',
+                            columns: [
+                                finalTime,
+                                finalData,
+
+                            ]
+                        },
+
+
+                        axis: {
+                            x: {
+                                type: 'timeseries',
+                                tick: {
+                                    format: '%Y-%m-%d'
+                                }
+                            }
+                        }
+
+
+                    })
+
+
                 }
 
                 // Remining requests today from your IP
@@ -356,77 +370,93 @@
 
 
     //new activity
-    function getQuestionsWithActivity () {
+    function getQuestionsWithActivity() {
         console.log("start");
         //generateTimeSerial("1429056000","1430524800");
 
-        generateTimeSerial(startDate,endDate)
+        generateTimeSerial(questions.startDate, questions.endDate);
+        console.log(tempData);
+        console.log(tempTime);
 
         // All questions for a certain time period - http://api.stackexchange.com/docs/search
         //response=getItems("withActivity", "http://api.stackexchange.com/2.2/search?fromdate=" + questions.startDate + "&todate=" + questions.	endDate + "&order=desc&sort=activity&tagged=" + questions.tag + "&site=stackoverflow&filter=!9WA((MBIa");
-        getItems("withActivity", "http://api.stackexchange.com/2.2/search?fromdate="+questions.startDate + "&todate="+questions.	endDate  + "&order=asc&sort=creation&tagged="+questions.tag + "&sort=creation"+"&site=stackoverflow&filter=!9WA((MBIa");
+        getItems("withActivity", "http://api.stackexchange.com/2.2/search?fromdate=" + questions.startDate + "&todate=" + questions.endDate + "&order=desc&sort=activity&tagged=" + questions.tag + "&site=stackoverflow&filter=!9WA((MBIa");
+        getQuestionItems("withActivity", "http://api.stackexchange.com/2.2/search?fromdate=" + questions.startDate + "&todate=" + questions.endDate + "&order=asc&sort=creation&tagged=" + questions.tag + "&sort=creation" + "&site=stackoverflow&filter=!9WA((MBIa");
     }
+
     //new activity
-
-
 
 
     //adding get time
 
-    function getDateTime(timestamp){
-        var a=new Date(timestamp);
-        var months = ['01','02','03','04','05','06','07','08','09','10','11','12'];
+    function getDateTime(timestamp) {
+        var a = new Date(timestamp);
+        var months = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
         var year = a.getFullYear();
         var month = ('0' + (a.getMonth() + 1)).slice(-2);  // Months are zero based. Add leading 0.
         var day = ('0' + a.getDate()).slice(-2);
         //var month = months[a.getMonth()];
         //var day=a.getDate();
-        var time=year+"-"+month+"-"+day;
+        var time = year + "-" + month + "-" + day;
 
         return time;
 
     }
+
     //gettimestamp
 
     //gettimeserial
-    function generateTimeSerial(start,end){
+    function generateTimeSerial(start, end) {
+        console.log(start);
+        console.log(end);
+        var s=new Date();
+        var t=start.split("-");
+        s.setFullYear(t[0],t[1]-1,t[2]);
+        var unixtimestart = Date.parse(s);
+        t=end.split("-");
+        var e=new Date();
+        e.setFullYear(t[0],t[1]-1,t[2]);
+        var unixtimeend = Date.parse(e);
 
+        console.log("generate time serial");
+        var date = new Date(unixtimestart);
+        console.log(date);
 
-        var date=new Date(start*1000);
-        var end=new Date(end*1000);
-        while(date<=end){
+        var end = new Date(unixtimeend);
+        while (date <= end) {
             tempTime.push(getDateTime(date));
             tempData.push(0);
             date.setTime(date.getTime() + 86400000);
         }
 
     }
+
     //get time serial
 
-    function getUnansweredQuestions () {
+    function getUnansweredQuestions() {
         // All questions without an answer for a certain time period - http://api.stackexchange.com/docs/unanswered-questions
         // "At this time a question must have at least one upvoted answer to be considered answered"
         getItems("unanswered", "http://api.stackexchange.com/2.2/questions/unanswered?fromdate=" + questions.startDate + "&todate=" + questions.endDate + "&order=desc&sort=activity&tagged=" + questions.tag + "&site=stackoverflow&filter=!9WA((MBIa");
     }
 
-    function topAnswerers () {
+    function topAnswerers() {
         getItems("topAnswerers", "http://api.stackexchange.com/2.2/tags/" + questions.tag + "/top-answerers/" + questions.timePeriod + "?site=stackoverflow");
     }
 
-    function topAskers () {
+    function topAskers() {
         getItems("topAskers", "http://api.stackexchange.com/2.2/tags/" + questions.tag + "/top-askers/" + questions.timePeriod + "?site=stackoverflow");
     }
 
-    function faq () {
+    function faq() {
         getItems("faq", "http://api.stackexchange.com/2.2/tags/" + questions.tag + "/faq?site=stackoverflow");
     }
 
-    function relatedTags () {
+    function relatedTags() {
         getItems("relatedTags", "http://api.stackexchange.com/2.2/tags/" + questions.tag + "/related?site=stackoverflow");
     }
 
     //checking values
-    function checkReports () {
+    function checkReports() {
         questions.tag = tag.value;
         questions.startDate = startDate.value;
         questions.endDate = endDate.value;
@@ -441,7 +471,7 @@
         relatedTags();
     }
 
-    function getPopularTags () {
+    function getPopularTags() {
         getItems("popularTags", "http://api.stackexchange.com/2.2/tags?pagesize=100&order=desc&sort=popular&site=stackoverflow");
     }
 

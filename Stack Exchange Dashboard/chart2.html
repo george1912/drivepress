@@ -19,10 +19,8 @@
 
         var finalTime;
         var finalData;
-        //var tempTime=['x'];
-        //var tempData=['data1'];
-        var tempTime=[];
-        var tempData=[];
+        var tempTime=['x'];
+        var tempData=['data1'];
 
         getQuestionsWithActivity();
 
@@ -46,7 +44,7 @@
                     }
                     else {
                         var items=response.items;
-                        for (var i=0; i<tempTime.length; i++){
+                        for (var i=1; i<tempTime.length; i++){
                             var count=0;
                             items.forEach(function(item){
                                 var jsonTime=getDateTime(item.creation_date*1000);
@@ -58,19 +56,19 @@
                             tempData[i]=count;
                         }
                         //console.log(tempTime);
-                        console.log("first");
                         finalData=[].concat(tempData);
-                        //console.log(tempData);
+
                         finalTime=[].concat(tempTime);
-                        console.log("last");
-                        console.log(finalData);
-                        console.log(finalTime);
+
+
+                       //chart added here
                         var chart = c3.generate({
                             data: {
                                 x: 'x',
                                 columns: [
-                                    finalData,
                                     finalTime,
+                                    finalData,
+
                                 ]
                             },
 
@@ -141,52 +139,6 @@
             getItems("withActivity", "http://api.stackexchange.com/2.2/search?fromdate=1429056000 " + "&todate=1430524800"  + "&order=asc&sort=creation&tagged=twilio" + "&sort=creation"+"&site=stackoverflow&filter=!9WA((MBIa");
         }
 
-
-
-        /* var chart = c3.generate({
-         data: {
-         x: 'x',
-         columns: [
-         finalTime,
-         finalData,
-         ]
-         },
-
-
-         axis: {
-         x: {
-         type: 'timeseries',
-         tick: {
-         format: '%Y-%m-%d'
-         }
-         }
-         }
-
-
-         });*/
-
-        /*var chart = c3.generate({
-         data: {
-         x: 'x',
-         //
-         columns: [
-         ["x", "2015-04-14", "2015-04-15", "2015-04-16", "2015-04-17", "2015-04-18", "2015-04-19", "2015-04-20", "2015-04-21", "2015-04-22", "2015-04-23", "2015-04-24", "2015-04-25", "2015-04-26", "2015-04-27", "2015-04-28", "2015-04-29", "2015-04-30", "2015-05-01"],
-         //
-         ["data1", 0, 7, 5, 2, 0, 0, 1, 5, 2, 2, 3, 1, 2, 0, 0, 0, 0, 0],
-
-         ]
-         },
-         axis: {
-         x: {
-         type: 'timeseries',
-         tick: {
-         format: '%Y-%m-%d'
-         }
-         }
-         }
-         });
-
-         */
         </script>
 
 
