@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+  <!-- <link rel="stylesheet" type="text/css" href="base2.css"-->
+    <script type='text/javascript' src='https://api.stackexchange.com/js/2.0/all.js'></script>
+    <!--script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/d3/3.4.11/d3.js"></script>
+    <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/c3/0.1.29/c3.js"></script-->
+    <script type='text/javascript' src='https://www.google.com/jsapi'></script>
+
+    <!--script type='text/javascript' src='https://www.google.com/jsapi'></script-->
+    <link href="http://cdnjs.cloudflare.com/ajax/libs/c3/0.1.29/c3.css" rel="stylesheet" type="text/css">
+
+
+    <scrip>
+
+
+    </scrip>
+
+    <title>Stack Overflow dashboard</title>
+
+</head>
+
+<body>
+
+<div id="container">
+
+    <section role="region">
+        <header>
+            <h1>
+                <img src="images/twilio-logo.png" alt=""> dashboard
+            </h1>
+        </header>
+    </section>
+
+
+    <div id="main">
+        <p>
+            This is the Twilio Activity Dashboard.
+            Remaining requests (Standard Rate Limit) <span id="remaining-requests"></span>
+        </p>
+        <p id="error">
+
+        </p>
+
+        <div>
+
+            <form id="selection-form">
+                <label for="stack-overflow-tag">Tag:</label>
+                <input id="stack-overflow-tag" list="popular-tags">
+                <datalist id="popular-tags">
+                    <option value="Java">
+                    <option value="JavaScript">
+                    <option value="HTML">
+                </datalist>
+
+                <label for="start-date">Dates</label>
+                <input type="date" id="start-date" value="2014-04-01">
+                <input type="date" id="end-date" value="2014-05-01">
+
+                <label for="time-period">Period</label>
+                <select id="time-period">
+                    <option value="month" selected>Month</option>
+                    <option value="all_time">All time</option>
+                </select>
+
+                <input type="submit" id="check-reports" value="Check">
+
+
+
+
+            </form>
+        </div>
+
+        <div id="results">
+
+            <section>
+                <h2>Quest (based on dates above)</h2>
+
+
+                <table>
+                    <tr>
+                        <th>With activity</th>
+                        <td id="questions-with-activity"></td>
+                    </tr>
+                    <tr>
+                        <th>Unanswered *</th>
+                        <td id="unanswered-questions"></td>
+                    </tr>
+                    <tr>
+                        <th>Results</th>
+                        <!--div id="chart"></div-->
+                        <div id='chart_div' style='width: 700px; height: 240px;'></div>
+                        <br>
+                        <td id="questions-results"></td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">* = (must have at least one upvoted answer to be considered answered)</td>
+                    </tr>
+                </table>
+            </section>
+
+            <section>
+                <h2>Top answerers (based on time period above)</h2>
+                <div>
+
+
+
+
+                </div>
+
+
+                <div id="top-answerers"></div>
+            </section>
+
+            <section>
+                <h2>Unanswered questions *</h2>
+                <div id="unanswered"></div>
+            </section>
+
+            <section>
+                <h2>Frequently asked questions</h2>
+                <div id="faq"></div>
+            </section>
+
+            <section>
+                <h2>Related tags</h2>
+                <div id="related-tags"></div>
+            </section>
+
+            <section>
+                <h2>Top askers (based on time period above)</h2>
+                <div id="top-askers"></div>
+
+            </section>
+        </div>
+
+    </div>
+
+
+</div>
+
+<script type="text/javascript" src="base3.js"></script>
+
+</body>
+</html>
