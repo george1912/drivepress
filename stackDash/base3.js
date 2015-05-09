@@ -124,7 +124,6 @@ google.load('visualization', '1', {'packages':['corechart']});
             popularTagsList.innerHTML = popularTagsResults;
         }
 
-
         // With activity load it into the html form at the achor #tag
         if (type === "withActivity") {
             document.querySelector("#questions-with-activity").innerHTML = questionsWithActivity;
@@ -263,8 +262,7 @@ google.load('visualization', '1', {'packages':['corechart']});
                 else {
                     var items=response.items;
                     numPast=items.length;
-                    console.log("see data"+numPast); 
-                    return numPast;
+                    console.log("numPast: "+numPast); 
                 }
 
             }
@@ -338,9 +336,12 @@ google.load('visualization', '1', {'packages':['corechart']});
                     showErrors(response.error_name, response.error_message);
                 }
                 else {
+                    questions[type] = response;
+                    addResults(type);
                     var items = response.items;
                     console.log(items);
                     numCurrent=items.length;
+                    console.log("numCurrent :"+numCurrent);
                     for (var i = 1; i < tempTime.length; i++) {
                         var count = 0;
                         items.forEach(function (item) {
@@ -353,13 +354,6 @@ google.load('visualization', '1', {'packages':['corechart']});
                         tempData[i] = count;
                         data.addRow([tempTime[i],tempData[i]]) ;
                     }
-
-                    //console.log(tempTime);
-                    console.log("first");
-                    finalData = [].concat(tempData);
-                    //console.log(tempData);
-                    finalTime = [].concat(tempTime);
-                    console.log("last");
                     var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
                         chart.draw(data, {displayAnnotations: true});
 
@@ -392,10 +386,9 @@ google.load('visualization', '1', {'packages':['corechart']});
         generateTimeSerial(questions.startDate, questions.endDate);
 
         // All questions for a certain time period - http://api.stackexchange.com/docs/search
-        getItems("withActivity", "http://api.stackexchange.com/2.2/search?pagesize=100&fromdate=" + questions.startDate + "&todate=" + questions.endDate + "&order=asc&sort=creation&tagged=" + questions.tag + "&site=stackoverflow&filter=!9WA((MBIa");
         getLastMonth("withActivity", "http://api.stackexchange.com/2.2/search?pagesize=100&fromdate=" + startLast.getTime()/1000 + "&todate=" + endLast.getTime()/1000 + "&order=asc&sort=creation&tagged=" + questions.tag + "&site=stackoverflow&filter=!9WA((MBIa");
-        console.log("first numPast: "+numPast);
         getQuestionItems("withActivity", "http://api.stackexchange.com/2.2/search?pagesize=100&fromdate=" + questions.startDate + "&todate=" + questions.endDate + "&order=asc&sort=creation&tagged=" + questions.tag + "&sort=creation" + "&site=stackoverflow&filter=!9WA((MBIa");
+        var t1 = setTimeout(function(){calculatePercentage();}, 2000);
     }
 
     //new activity
@@ -496,6 +489,14 @@ google.load('visualization', '1', {'packages':['corechart']});
 
     function getPopularTags() {
         getItems("popularTags", "http://api.stackexchange.com/2.2/tags?pagesize=100&order=desc&sort=popular&site=stackoverflow");
+    }
+
+    function calculatePercentage(){
+        percentage=(numCurrent-numPast)/numCurrent;
+        console.log("percentage: "+percentage);
+        document.querySelector("#time-range").innerHTML = startLast.getMonth()+"-"+startLast.getDate()+"-"+startLast.getFullYear()+" to "+endLast.getMonth()+"-"+endLast.getDate()+"-"+endLast.getFullYear();
+        document.querySelector("#question-percentage").innerHTML = percentage;
+
     }
 
 
