@@ -388,7 +388,7 @@ google.load('visualization', '1', {'packages':['corechart']});
         // All questions for a certain time period - http://api.stackexchange.com/docs/search
         getLastMonth("withActivity", "http://api.stackexchange.com/2.2/search?pagesize=100&fromdate=" + startLast.getTime()/1000 + "&todate=" + endLast.getTime()/1000 + "&order=asc&sort=creation&tagged=" + questions.tag + "&site=stackoverflow&filter=!9WA((MBIa");
         getQuestionItems("withActivity", "http://api.stackexchange.com/2.2/search?pagesize=100&fromdate=" + questions.startDate + "&todate=" + questions.endDate + "&order=asc&sort=creation&tagged=" + questions.tag + "&sort=creation" + "&site=stackoverflow&filter=!9WA((MBIa");
-        var t1 = setTimeout(function(){calculatePercentage();}, 2000);
+        var t1 = setTimeout(function(){calculatePercentage();}, 1000);
     }
 
     //new activity
@@ -492,10 +492,10 @@ google.load('visualization', '1', {'packages':['corechart']});
     }
 
     function calculatePercentage(){
-        percentage=(numCurrent-numPast)/numCurrent;
-        console.log("percentage: "+percentage);
-        document.querySelector("#time-range").innerHTML = startLast.getMonth()+"-"+startLast.getDate()+"-"+startLast.getFullYear()+" to "+endLast.getMonth()+"-"+endLast.getDate()+"-"+endLast.getFullYear();
-        document.querySelector("#question-percentage").innerHTML = percentage;
+        percentage=(numCurrent-numPast)/numCurrent*100;
+        console.log("percentage: "+percentage.toFixed(2)+"%");
+        document.querySelector("#time-range").innerHTML = startLast.toLocaleDateString()+" to "+endLast.toLocaleDateString();
+        document.querySelector("#question-percentage").innerHTML = percentage.toFixed(2) + "%";
 
     }
 
