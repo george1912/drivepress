@@ -7,7 +7,7 @@ google.load('visualization', '1', {'packages':['corechart']});
     var tempTime=['x'];
     var tempData=['data1'];
     var numCurrent;
-    //var numPast;
+    var numPast;
     var percentage;
     var startLast;
     var endLast;
@@ -253,7 +253,6 @@ google.load('visualization', '1', {'packages':['corechart']});
         var xhr = new XMLHttpRequest();
         //Stores a function (or the name of a function) to be called automatically each time the readyState property changes
         xhr.onreadystatechange = function () {
-            var numPast;
             //Get the loading status of the current document
             if (xhr.readyState === 4) {
                 var response = xhr.response,
@@ -317,7 +316,7 @@ google.load('visualization', '1', {'packages':['corechart']});
     //plugging in values
 
 
-    function getQuestionItems(type,num, url) {
+    function getQuestionItems(type, url) {
         var data = new google.visualization.DataTable();
         data.addColumn('string', 'Day');
         data.addColumn('number', 'count');
@@ -342,10 +341,6 @@ google.load('visualization', '1', {'packages':['corechart']});
                     var items = response.items;
                     console.log(items);
                     numCurrent=items.length;
-                    console.log(numCurrent);
-                    console.log(num);
-                    percentage=(numCurrent-num)/numCurrent;
-                    console.log(percentage);
                     for (var i = 1; i < tempTime.length; i++) {
                         var count = 0;
                         items.forEach(function (item) {
@@ -398,9 +393,9 @@ google.load('visualization', '1', {'packages':['corechart']});
 
         // All questions for a certain time period - http://api.stackexchange.com/docs/search
         getItems("withActivity", "http://api.stackexchange.com/2.2/search?pagesize=100&fromdate=" + questions.startDate + "&todate=" + questions.endDate + "&order=asc&sort=creation&tagged=" + questions.tag + "&site=stackoverflow&filter=!9WA((MBIa");
-        var numPast=getLastMonth("withActivity", "http://api.stackexchange.com/2.2/search?pagesize=100&fromdate=" + startLast.getTime()/1000 + "&todate=" + endLast.getTime()/1000 + "&order=asc&sort=creation&tagged=" + questions.tag + "&site=stackoverflow&filter=!9WA((MBIa");
+        getLastMonth("withActivity", "http://api.stackexchange.com/2.2/search?pagesize=100&fromdate=" + startLast.getTime()/1000 + "&todate=" + endLast.getTime()/1000 + "&order=asc&sort=creation&tagged=" + questions.tag + "&site=stackoverflow&filter=!9WA((MBIa");
         console.log("first numPast: "+numPast);
-        getQuestionItems("withActivity", numPast, "http://api.stackexchange.com/2.2/search?pagesize=100&fromdate=" + questions.startDate + "&todate=" + questions.endDate + "&order=asc&sort=creation&tagged=" + questions.tag + "&sort=creation" + "&site=stackoverflow&filter=!9WA((MBIa");
+        getQuestionItems("withActivity", "http://api.stackexchange.com/2.2/search?pagesize=100&fromdate=" + questions.startDate + "&todate=" + questions.endDate + "&order=asc&sort=creation&tagged=" + questions.tag + "&sort=creation" + "&site=stackoverflow&filter=!9WA((MBIa");
     }
 
     //new activity
@@ -503,8 +498,10 @@ google.load('visualization', '1', {'packages':['corechart']});
         getItems("popularTags", "http://api.stackexchange.com/2.2/tags?pagesize=100&order=desc&sort=popular&site=stackoverflow");
     }
 
+
+
     // Run automatically at page load to pre-populate the <datalist> element
-    getPopularTags();
+    //getPopularTags();
 })();
 
 
