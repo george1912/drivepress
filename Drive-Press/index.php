@@ -6,6 +6,19 @@
 
  */
 
+//add a setting page
+function GooglePicker_settings() {
+    include('GooglePicker_settings.php');
+}
+
+/*
+ * Add DrivePress settings page to admin
+ */
+add_action('admin_menu', 'GooglePicker_settings_actions');
+function GooglePicker_settings_actions() {
+    add_options_page('DrivePress', 'DrivePress', 'upload_files', 'DrivePress', 'GooglePicker_settings');
+}
+
 //add a button to the content editor, next to the media button
 add_action('media_buttons_context', 'add_my_custom_button');
 //add some content to the bottom of the page 
@@ -15,26 +28,45 @@ add_action('admin_footer', 'add_inline_popup_content');
 add_action('init', 'googlepicker_plugin_init');
 
 function googlepicker_plugin_init() {
-    $apikey = 'AIzaSyD2MXMpx_c6H38-wk3z097UbVPgg-FakaU';
-    $init = 'googleClientLoaded';
-    $urltext = sprintf('https://www.google.com/jsapi?key=%s',$apikey,$apikey);        
-    $urltextsecond = sprintf('https://apis.google.com/js/client.js?onload=%s',$init,$init);           
+    $init = 'googleClientLoaded';    
+    $urltext = sprintf('https://apis.google.com/js/client.js?onload=%s',$init,$init);   
+    $stylesheet = sprintf('https://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css');
+    $Jqueryui = sprintf('https://code.jquery.com/ui/1.11.4/jquery-ui.js');
     wp_register_script( 'filepicker', plugins_url( 'js/filepicker.js', __FILE__ ),array('jquery'), '2.2.1', true );   
-    wp_register_script( 'client', $urltextsecond );   
-    wp_register_script( 'jsapi', $urltext ); 
+    wp_register_style( 'stylesheet',$stylesheet  );
+    wp_register_style( 'Jqueryui',$Jqueryui  );
+    wp_register_style( 'footer', plugins_url( 'css/footerStyle.css',__FILE__ ) );
+
+   		
+    wp_register_script( 'client', $urltext );   
     wp_enqueue_script( 'filepicker' );
     wp_enqueue_script( 'client' );
-    wp_enqueue_script( 'jsapi' );
     wp_enqueue_script( 'jquery' );
+    wp_enqueue_script( 'Jqueryui' );
+    wp_enqueue_style('stylesheet');
+    wp_enqueue_style( 'footer' );
+    
     wp_localize_script('filepicker', 'WP_GP_PARAMS', _googlepicker_get_js_cfg());
 }
 
 function _googlepicker_get_js_cfg() {
+    //echo get_option('googlepicker_public');
     return array(
-        'ajaxurl' => admin_url('admin-ajax.php'),
+        'Client_ID' => get_option('googlepicker_public'),
+       // 'ajaxurl' => admin_url('admin-ajax.php'),
     );
 }
 
+add_action('wp_ajax_google_picker_handle', 'google_picker_handle');
+
+function google_picker_handle() {
+        $file_id = $_POST['file_id'];
+        $title=$_POST['title'];
+        $file_id = stripslashes($file_id);
+        $link=google_picker_attach($file_id,$title);
+        echo $link;    
+        exit;
+}
 
 function fetch_img_contents($url) {
      if ( function_exists("curl_init") ) {
@@ -143,7 +175,7 @@ function get_clean_dom_doc($contents)
             $img->setAttribute ('class','" aligncenter');
         }
         else{
-            $img->setAttribute('class','" alignright');
+            $img->setAttribute('class','" aligncenter');
         }
     }
     
@@ -286,17 +318,6 @@ function google_picker_attach($content,$title) {
         return admin_url('post.php?post='.$post_id.'&action=edit');
 }
 
-add_action('wp_ajax_google_picker_handle', 'google_picker_handle');
-
-function google_picker_handle() {
-        $file_id = $_POST['file_id'];
-        $title=$_POST['title'];
-        $file_id = stripslashes($file_id);
-        $link=google_picker_attach($file_id,$title);
-        echo $link;    
-        exit;
-}
-
 //action to add a custom button to the content editor
 function add_my_custom_button($context) {
   
@@ -304,7 +325,7 @@ function add_my_custom_button($context) {
           $img = plugins_url( 'media/logo.png' , __FILE__ );
 
           //our popup's title
-          $title = 'Google Drive Popup!';
+          $title = 'Click to convert from Google Drive!';
 
           //append the icon
           $context =<<<HTML
@@ -315,11 +336,19 @@ HTML;
 }
 
 function add_inline_popup_content() {
+//$loadingimg = plugins_url( 'loading.gif' , __FILE__ );
+ //echo $loadingi;mg
+ add_thickbox();     
 ?>
-          <div data-behavior="picker_account_switcher" class="picker_account_switcher">
-            <strong>You&rsquo;re signed in to Google as <span data-role="picker_account_email"></span></strong>
-            <a data-behavior="google_account_switcher" href="#">Sign out and use a different Google account</a>
-          </div>
+  <div id="sign-out" data-behavior="picker_account_switcher" class="picker_account_switcher">
+    <strong>You&rsquo;re signed in to Google as <span data-role="picker_account_email"></span></strong>
+    <a data-behavior="google_account_switcher" href="#">Sign out and use a different Google account</a>
+  </div>
+  <div id="my-content-id" class="thickbox" title="Please wait...">
+      <center><Strong>Document with more images will take more time to convert</strong></center>  
+      <img src = "<?php echo plugins_url( 'media/loading_spinner.gif' , __FILE__ );?>" 
+           alt="Upload document" style ="float: left; margin:0 0 0 60px;width:125px; height:125px;" />
+      </div>
 
 <?php
 }

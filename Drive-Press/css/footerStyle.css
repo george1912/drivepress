@@ -1,0 +1,6 @@
+#my-content-id{
+    display: none;
+} 
+.ui-dialog-titlebar-close {
+  visibility: hidden;
+}
